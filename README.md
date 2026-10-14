@@ -1,0 +1,2 @@
+# rivo
+Rivo CLI/TUI
