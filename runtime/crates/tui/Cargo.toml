@@ -1,0 +1,20 @@
+[package]
+name = "rivo-tui"
+description = "Rivo ratatui/crossterm 前端状态与渲染"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rivo-core = { path = "../core" }
+crossterm.workspace = true
+rivo-session = { path = "../session" }
+ratatui.workspace = true
+serde_json.workspace = true
+unicode-segmentation = "1"
+unicode-width = "0.1"
+
+[dev-dependencies]
+rivo-core = { path = "../core" }
+rivo-policy = { path = "../policy" }

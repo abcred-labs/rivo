@@ -1,0 +1,20 @@
+[package]
+name = "rivo-llm"
+description = "Rivo 统一 LLM 协议适配层"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-stream.workspace = true
+async-trait.workspace = true
+base64.workspace = true
+futures.workspace = true
+rivo-core = { path = "../core" }
+rivo-tools = { path = "../tools" }
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true

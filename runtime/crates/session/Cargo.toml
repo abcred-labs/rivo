@@ -1,0 +1,37 @@
+[package]
+name = "rivo-session"
+description = "Rivo 前端无关会话契约"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-stream.workspace = true
+async-trait.workspace = true
+base64.workspace = true
+chacha20poly1305.workspace = true
+dirs.workspace = true
+fs2.workspace = true
+hex.workspace = true
+futures.workspace = true
+rivo-core = { path = "../core" }
+rivo-a2a = { path = "../a2a" }
+ rivo-agent = { path = "../agent" }
+rivo-llm = { path = "../llm" }
+rivo-i18n = { path = "../i18n" }
+rivo-policy = { path = "../policy" }
+ rivo-prompts-management = { path = "../prompts-management" }
+ rivo-storage = { path = "../storage" }
+ rivo-telemetry = { path = "../telemetry" }
+rivo-tools = { path = "../tools" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+rand_core.workspace = true
+
+[dev-dependencies]

@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Rivo Browser Control",
+  "version": "0.1.0",
+  "description": "Rivo Chrome/Edge browser control bridge",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArOuj5xmbVN/6twfG11PBZCjMYVRcbxM+a43w91uodEmmo9Vt6o1BfU7TH7bksNZRw1z4ZaostkL0ckCu7xHTcMYm+wmArALtvI+n++DMbyfTXmbZ1/ktZvObgyno4a3vpBIzQ5ZuxS9oAsgtnQAVNymzfy9AdB9WTtb+H2ZnsejxItxa3PFWW3B5G4kHltMowQIlyskL7917Kt8byLz8CYnmKW4qspumjuxHba1G7x7YAfzwhaws1d6erzw+rTI+4wnm1b1Y90gADTu+bBcW/ydnYz6OkVcHTynYS8CUO1gchCR32qh5W0NravnB0nd4+jVBnXuVWofieVqkEmrpaQIDAQAB",
+  "permissions": ["nativeMessaging", "tabs", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "service-worker.js", "type": "module" },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content-script.js"],
+    "run_at": "document_idle"
+  }]
+}

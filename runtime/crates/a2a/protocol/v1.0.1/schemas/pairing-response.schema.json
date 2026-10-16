@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rivo.invalid/a2a/rivo-a2a-lan-v1/pairing-response.schema.json",
+  "title": "Rivo LAN pairing response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "request_id", "server_spki_sha256", "client_public_key_sha256", "expires_at", "sas_words", "claim_token"],
+  "properties": {
+    "version": {"const": "rivo-a2a-lan-v1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "server_spki_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "client_public_key_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "sas_words": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "string", "pattern": "^[a-z]+$"}},
+    "claim_token": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"}
+  }
+}

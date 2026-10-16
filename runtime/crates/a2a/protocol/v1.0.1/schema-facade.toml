@@ -1,0 +1,21 @@
+# `rivo-a2a` Step 020 build.rs 的冻结输入。实际 crate 只能从本文件读取 proto 路径；
+# 变更协议必须新建版本目录而非改写本配置。
+[facade]
+crate = "rivo-a2a"
+module = "a2a.v1"
+output = "src/generated/a2a_v1.rs"
+
+[prost_build]
+protoc = "29.3"
+prost_build = "0.13.5"
+compile_protos = ["a2a.proto"]
+# `buf export` 使用本目录的 buf.lock 写入此目录，然后 protoc 才能解析 a2a.proto 的 google/api imports。
+includes = [".", "third_party/googleapis"]
+file_descriptor_set = "src/generated/a2a_v1.descriptor.bin"
+
+[protobuf_dependencies.googleapis]
+module = "buf.build/googleapis/googleapis"
+commit = "004180b77378443887d3b55cabc00384"
+digest = "b5:e8f475fe3330f31f5fd86ac689093bcd274e19611a09db91f41d637cb9197881ce89882b94d13a58738e53c91c6e4bae7dc1feba85f590164c975a89e25115dc"
+buf_lock = "buf.lock"
+export_dir = "third_party/googleapis"

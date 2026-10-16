@@ -1,0 +1,10 @@
+{
+  "name": "Rivo Research LAN",
+  "description": "Frozen local fixture; not a production card.",
+  "url": "https://10.0.0.12:8443/a2a",
+  "version": "1.0.0",
+  "capabilities": { "streaming": true },
+  "defaultInputModes": ["text", "application/json"],
+  "defaultOutputModes": ["text", "application/json"],
+  "skills": [{ "id": "research", "name": "Research" }]
+}

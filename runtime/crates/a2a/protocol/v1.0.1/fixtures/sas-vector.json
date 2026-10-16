@@ -1,0 +1,7 @@
+{
+  "request_id": "pair-01HVALID",
+  "server_spki_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "client_public_key_sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+  "sha256": "bd93cc5d87cf923633e761ffe94234ef108a38762ec71559de4cb5f02fe2d989",
+  "sas_words": ["rural", "oyster", "blast", "auto", "weird", "brand"]
+}

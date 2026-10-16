@@ -1,0 +1,17 @@
+[package]
+name = "rivo-prompts-management"
+description = "Rivo 提示词资产、持久指令与上下文组合"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+hex.workspace = true
+rivo-policy = { path = "../policy" }
+serde.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

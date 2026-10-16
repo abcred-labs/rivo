@@ -1,0 +1,19 @@
+# 此目录是 V2 A2A wire 的唯一冻结输入。更新必须新增版本目录，不得修改本目录。
+[upstream]
+repository = "https://github.com/a2aproject/A2A"
+tag = "v1.0.1"
+commit = "3303592588e388e62e0f69f701af531d2f4e3991"
+path = "specification/a2a.proto"
+sha256 = "e195bf96ab630c69797851970203e1b2b6b19528f2e9803b7d904b91a5104016"
+license_path = "LICENSE"
+
+[generator]
+protoc = "29.3"
+prost_build = "0.13.5"
+
+[sas_wordlist]
+repository = "https://github.com/bitcoin/bips"
+commit = "9783d61f1b9c81231581fee026c8e8cb9499d265"
+path = "bip-0039/english.txt"
+sha256 = "2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda"
+words = 2048

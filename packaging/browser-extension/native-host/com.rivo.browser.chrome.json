@@ -1,0 +1,7 @@
+{
+  "name": "com.rivo.browser",
+  "description": "Rivo browser extension Native Messaging host",
+  "path": "C:\\Program Files\\Rivo\\rivo-browser-extension-host.exe",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://__EXTENSION_ID__/"]
+}

@@ -1,0 +1,94 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/cli",
+    "crates/agent",
+    "crates/a2a",
+    "crates/a2a-server",
+    "crates/core",
+    "crates/i18n",
+    "crates/llm",
+    "crates/policy",
+    "crates/prompts-management",
+    "crates/session",
+    "crates/storage",
+    "crates/test-support",
+    "crates/telemetry",
+    "crates/tui",
+    "crates/xtask",
+    "crates/tools",
+    "crates/instance-control",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "MIT"
+repository = "https://github.com/abcred-labs/rivo"
+description = "Policy-controlled Rust agent runtime and CLI"
+rust-version = "1.88"
+
+[workspace.dependencies]
+anyhow = "1"
+async-stream = "0.3"
+async-trait = "0.1"
+base64 = "0.22"
+p256 = { version = "0.13", features = ["ecdsa", "ecdh", "pkcs8"] }
+png = "0.17"
+chacha20poly1305 = "0.10"
+dirs = "6"
+fs2 = "0.4"
+futures = "0.3"
+fluent-bundle = "0.16"
+fluent-syntax = "0.12"
+hmac = "0.12"
+hkdf = "0.12"
+rand_core = { version = "0.6", features = ["getrandom"] }
+hex = "0.4"
+libc = "0.2"
+keyring = { version = "3", features = ["windows-native", "apple-native", "sync-secret-service"] }
+regex = "1"
+ratatui = "0.27"
+rusqlite = { version = "0.32", features = ["bundled", "backup"] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "multipart",
+    "rustls-tls",
+    "stream",
+] }
+rustls = "0.23"
+rustls-webpki = "0.103"
+x509-parser = "0.16"
+zeroize = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tempfile = "3"
+thiserror = "2"
+time = { version = "0.3", features = ["formatting", "parsing"] }
+rpassword = "7"
+tokio = { version = "1", features = [
+	"io-util",
+	"io-std",
+	"macros",
+	"net",
+    "process",
+    "rt-multi-thread",
+    "sync",
+    "time",
+] }
+tokio-tungstenite = { version = "0.26", default-features = false, features = ["connect", "handshake"] }
+toml = "0.9"
+unic-langid = "0.9.6"
+# 关闭 color 特性以移除 anstream -> anstyle-wincon -> windows-sys 依赖链，
+# 使 GNU 工具链无需完整 MinGW（dlltool/as）即可构建。切回 MSVC 可恢复默认特性。
+clap = { version = "4", default-features = false, features = [
+    "std",
+    "derive",
+    "help",
+    "usage",
+    "error-context",
+    "suggestions",
+] }
+crossterm = "0.27"
+

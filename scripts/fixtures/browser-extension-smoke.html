@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Rivo extension smoke</title>
+<style>
+  body { min-height: 2200px; font: 16px sans-serif; }
+  #status { position: sticky; top: 0; background: white; }
+  .sensitive-fixture { margin-top: 8px; }
+</style>
+<h1>Rivo extension smoke</h1>
+<button id="smoke" type="button">Rivo smoke button</button>
+<input placeholder="smoke-input" aria-label="smoke-input">
+<select id="smoke-select" aria-label="smoke-select">
+  <option value="one">One</option>
+  <option value="two">Two</option>
+</select>
+<button id="wait-target" type="button">Rivo wait target</button>
+<button id="wait-timeout-target" type="button">Rivo wait timeout target</button>
+<a id="blank-link" href="/new-tab" target="_blank">Rivo blank link</a>
+<input class="sensitive-fixture" type="password" data-rivo-ref="rivo-900" aria-label="sensitive-password">
+<input class="sensitive-fixture" type="file" data-rivo-ref="rivo-901" aria-label="sensitive-file">
+<button id="hidden-target" type="button" data-rivo-ref="rivo-902" style="display:none">Hidden target</button>
+<h2 id="click-result">Rivo smoke not clicked</h2>
+<p id="key-result">Rivo enter not pressed</p>
+<p id="select-result">selected:none</p>
+<p id="profile-marker"></p>
+<div id="status" aria-live="polite">Rivo smoke fixture ready</div>
+<script>
+  const profile = new URL(location.href).searchParams.get('profile');
+  document.querySelector('#profile-marker').textContent = profile ? `Rivo profile: ${profile}` : '';
+  document.querySelector('#smoke').addEventListener('click', () => {
+    document.querySelector('#click-result').textContent = 'Rivo smoke clicked';
+  });
+  document.querySelector('#smoke-select').addEventListener('change', event => {
+    document.querySelector('#select-result').textContent = `selected:${event.target.value}`;
+  });
+  document.querySelector('#wait-target').addEventListener('click', event => {
+    const button = event.currentTarget;
+    const parent = button.parentElement;
+    button.remove();
+    setTimeout(() => parent.append(button), 180);
+  });
+  document.querySelector('#wait-timeout-target').addEventListener('click', event => {
+    event.currentTarget.remove();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Enter') document.querySelector('#key-result').textContent = 'Rivo enter pressed';
+  });
+</script>

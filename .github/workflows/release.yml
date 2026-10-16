@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package ${{ matrix.platform }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: amd64
+            binary: runtime/target/release/rivo.exe
+          - os: ubuntu-latest
+            platform: linux
+            arch: amd64
+            binary: runtime/target/release/rivo
+          - os: macos-13
+            platform: macos
+            arch: amd64
+            binary: runtime/target/release/rivo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Build release binary
+        working-directory: runtime
+        run: cargo build --release --locked
+      - name: Package archive
+        env:
+          VERSION: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          version="${VERSION#v}"
+          python scripts/package.py \
+            --binary "${{ matrix.binary }}" \
+            --version "$version" \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --commit "${GITHUB_SHA}" \
+            --out release
+          python scripts/release_manifest.py \
+            --directory release \
+            --version "$version" \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --commit "${GITHUB_SHA}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}-${{ matrix.arch }}
+          path: release/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true

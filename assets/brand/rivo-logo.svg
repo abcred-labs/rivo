@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 256" role="img" aria-labelledby="title desc">
+  <title id="title">Rivo</title>
+  <desc id="desc">Rivo four-way flow mark with a geometric path wordmark.</desc>
+  <g fill="none" stroke="#F26A3D" stroke-linecap="round" stroke-linejoin="round" stroke-width="24">
+    <path d="M128 36V78Q128 96 146 96H176"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(90 128 128)"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(180 128 128)"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(270 128 128)"/>
+  </g>
+  <g fill="none" stroke="#1F2328" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
+    <path d="M310 184V72H358A36 36 0 0 1 358 144H310M355 144L397 184"/>
+    <path d="M440 112V184"/>
+    <circle cx="440" cy="78" r="10" fill="#1F2328" stroke="none"/>
+    <path d="M480 112L514 184L548 112"/>
+    <path d="M615 112A36 36 0 1 0 615 184A36 36 0 1 0 615 112Z"/>
+  </g>
+</svg>

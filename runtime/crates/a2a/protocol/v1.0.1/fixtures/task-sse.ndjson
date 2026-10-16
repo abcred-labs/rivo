@@ -1,0 +1,2 @@
+{"event":"snapshot","task_id":"fixture-task-1","revision":1,"state":"WORKING"}
+{"event":"status","task_id":"fixture-task-1","revision":2,"state":"COMPLETED"}

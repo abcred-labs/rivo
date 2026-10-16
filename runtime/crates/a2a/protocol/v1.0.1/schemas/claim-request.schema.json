@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rivo.invalid/a2a/rivo-a2a-lan-v1/claim-request.schema.json",
+  "title": "Rivo LAN pairing claim request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "request_id", "claim_token", "claim_proof"],
+  "properties": {
+    "version": {"const": "rivo-a2a-lan-v1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "claim_token": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+    "claim_proof": {"type": "string", "minLength": 8, "pattern": "^[A-Za-z0-9_-]+$", "description": "unpadded canonical base64url of an ASN.1 DER ECDSA-SHA256 P-256 signature"}
+  }
+}

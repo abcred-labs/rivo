@@ -1,0 +1,78 @@
+# Rust / Cargo build output
+/target/
+**/target/
+runtime/target/
+
+# Manual build distribution output
+/dist/
+
+# Cargo lock (keep for binaries, uncomment to ignore for libraries)
+# Cargo.lock
+
+# Backtrace / debug artifacts
+*.pdb
+*.profraw
+artifacts/
+
+# Compiled files
+__pycache__/
+*.py[cod]
+*.o
+*.rlib
+*.rmeta
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+live-test.toml
+runtime/fuzz/artifacts/
+*.local
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_ed25519
+credentials.json
+secrets.json
+
+# Editor / IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+.codex-dev-tmp-tasks/
+*.tmp
+*.bak
+tmp/
+.tmp-v2-target
+.tmp-browser-target/
+debug
+runtime/target*
+bin
+obj
+.a2a-*/
+.rivo/

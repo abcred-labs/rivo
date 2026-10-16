@@ -1,0 +1,27 @@
+[package]
+name = "rivo-agent"
+description = "Rivo 顺序 Agent 循环与工具注册表"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+async-stream.workspace = true
+futures.workspace = true
+hex.workspace = true
+rivo-core = { path = "../core" }
+rivo-a2a = { path = "../a2a" }
+rivo-llm = { path = "../llm" }
+rivo-policy = { path = "../policy" }
+rivo-tools = { path = "../tools" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio.workspace = true

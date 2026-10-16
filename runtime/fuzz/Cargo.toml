@@ -1,0 +1,22 @@
+[package]
+name = "rivo-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+rivo-session = { path = "../crates/session" }
+
+[[bin]]
+name = "config_parser"
+path = "fuzz_targets/config_parser.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+

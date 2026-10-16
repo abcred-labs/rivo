@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rivo.invalid/a2a/rivo-a2a-lan-v1/pairing-request.schema.json",
+  "title": "Rivo LAN pairing request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "csr_pem"],
+  "properties": {
+    "version": {"const": "rivo-a2a-lan-v1"},
+    "csr_pem": {"type": "string", "minLength": 1, "maxLength": 16384}
+  }
+}

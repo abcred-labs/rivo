@@ -1,0 +1,25 @@
+[package]
+name = "rivo-storage"
+description = "Rivo SQLite 会话历史与持久记忆"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+fs2.workspace = true
+hex.workspace = true
+libc.workspace = true
+rivo-core = { path = "../core" }
+rivo-a2a = { path = "../a2a" }
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+rand_core.workspace = true
+time.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

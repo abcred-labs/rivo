@@ -1,0 +1,22 @@
+[package]
+name = "rivo-instance-control"
+description = "本机与局域网 rivo 实例控制协议和注册表"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+fs2.workspace = true
+rivo-core = { path = "../core" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+hex.workspace = true
+rand_core.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]

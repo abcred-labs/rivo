@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rivo.invalid/a2a/v1.0.1/schemas/a2a-delegate.schema.json",
+  "title": "Rivo A2A delegate request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["peer_id", "skill_id", "message"],
+  "properties": {
+    "peer_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "skill_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "message": {"type": "string", "x-maxUtf8Bytes": 65536},
+    "stream": {"type": "boolean", "default": false},
+    "artifacts": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "content"],
+        "properties": {
+          "kind": {"enum": ["text", "json"]},
+          "name": {"type": "string", "maxLength": 128, "pattern": "^[A-Za-z0-9._-]+$"},
+          "content": {"type": "string", "x-canonicalJson": "RFC8785 when kind is json"}
+        }
+      }
+    }
+  }
+}

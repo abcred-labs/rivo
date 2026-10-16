@@ -1,0 +1,12 @@
+[package]
+name = "rivo-core"
+description = "Rivo 核心消息、事件与证据契约"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

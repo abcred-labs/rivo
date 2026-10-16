@@ -1,0 +1,219 @@
+application_version = "0.1.0"
+schema_version = 6
+# supported_protocols 按偏好排序：路由始终使用第一项；Provider 不携带协议。
+# 用户可在本地 [models] 中覆盖某内置模型的协议列表（增删或调整顺序）。
+
+[vendors.anthropic]
+display_name = "Anthropic"
+# official_models = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-09-23
+
+[vendors.deepseek]
+display_name = "DeepSeek"
+# official_models = https://api-docs.deepseek.com/quick_start/pricing
+# official_protocol = https://api-docs.deepseek.com/guides/responses_api
+# verified_at = 2026-09-23
+
+[vendors.openai]
+display_name = "OpenAI"
+# official_models = https://platform.openai.com/docs/models
+# verified_at = 2026-09-23
+
+[vendors.xai]
+display_name = "xAI"
+# official_models = https://docs.x.ai/docs/models
+# verified_at = 2026-09-23
+
+[vendors.zhipu]
+display_name = "智谱"
+# official_models = https://docs.z.ai/guides/llm/glm-5.3
+# verified_at = 2026-09-23
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-09-23
+[models."claude-haiku-4-5"]
+vendor = "anthropic"
+display_name = "claude-haiku-4-5"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-10-10
+[models."claude-opus-5-5"]
+vendor = "anthropic"
+display_name = "claude-opus-5-5"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-09-23
+[models."claude-opus-4-6"]
+vendor = "anthropic"
+display_name = "claude-opus-4-6"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-09-23
+[models."claude-sonnet-4-5"]
+vendor = "anthropic"
+display_name = "claude-sonnet-4-5"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-09-23
+[models."claude-sonnet-4-6"]
+vendor = "anthropic"
+display_name = "claude-sonnet-4-6"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://docs.anthropic.com/en/docs/about-claude/models
+# verified_at = 2026-10-10
+[models."claude-sonnet-5-5"]
+vendor = "anthropic"
+display_name = "claude-sonnet-5-5"
+supported_protocols = ["claude_messages"]
+
+# official_model = https://api-docs.deepseek.com/quick_start/pricing
+# official_protocol = https://api-docs.deepseek.com/guides/responses_api
+# verified_at = 2026-09-23
+[models."deepseek-flash"]
+vendor = "deepseek"
+display_name = "deepseek-flash"
+supported_protocols = ["openai_chat_completions", "openai_responses", "claude_messages"]
+
+# official_model = https://api-docs.deepseek.com/quick_start/pricing
+# official_protocol = https://api-docs.deepseek.com/guides/responses_api
+# verified_at = 2026-09-23
+[models."deepseek-v4-flash"]
+vendor = "deepseek"
+display_name = "deepseek-v4-flash"
+supported_protocols = ["openai_chat_completions", "openai_responses", "claude_messages"]
+
+# official_model = https://api-docs.deepseek.com/quick_start/pricing
+# official_protocol = https://api-docs.deepseek.com/guides/responses_api
+# verified_at = 2026-09-23
+[models."deepseek-v4-pro"]
+vendor = "deepseek"
+display_name = "deepseek-v4-pro"
+supported_protocols = ["openai_chat_completions", "openai_responses", "claude_messages"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-5
+# verified_at = 2026-09-23
+[models."gpt-5"]
+vendor = "openai"
+display_name = "GPT-5"
+supported_protocols = ["openai_responses", "openai_chat_completions"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-5.1
+# verified_at = 2026-09-23
+[models."gpt-5.1"]
+vendor = "openai"
+display_name = "gpt-5.1"
+supported_protocols = ["openai_responses", "openai_chat_completions"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-5.2
+# verified_at = 2026-09-23
+[models."gpt-5.2"]
+vendor = "openai"
+display_name = "gpt-5.2"
+supported_protocols = ["openai_responses", "openai_chat_completions"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-5.2-chat-latest
+# verified_at = 2026-09-23
+[models."gpt-5.2-chat-latest"]
+vendor = "openai"
+display_name = "gpt-5.2-chat-latest"
+supported_protocols = ["openai_responses", "openai_chat_completions"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-5.3-codex
+# official_protocol = https://platform.openai.com/docs/api-reference/responses
+# verified_at = 2026-09-23
+[models."gpt-5.3-codex"]
+vendor = "openai"
+display_name = "gpt-5.3-codex"
+supported_protocols = ["openai_responses"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-6-astra
+# official_protocol = https://platform.openai.com/docs/api-reference/responses
+# verified_at = 2026-09-23
+[models."gpt-6-astra"]
+vendor = "openai"
+display_name = "gpt-6-astra"
+supported_protocols = ["openai_responses"]
+
+# official_model = https://platform.openai.com/docs/models
+# official_protocol = https://platform.openai.com/docs/api-reference/responses
+# verified_at = 2026-10-10
+[models."gpt-6.1-sol"]
+vendor = "openai"
+display_name = "gpt-6.1-sol"
+supported_protocols = ["openai_responses", "openai_chat_completions"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-6-sol
+# official_protocol = https://platform.openai.com/docs/api-reference/responses
+# verified_at = 2026-09-23
+[models."gpt-6-sol"]
+vendor = "openai"
+display_name = "gpt-6-sol"
+supported_protocols = ["openai_responses"]
+
+# official_model = https://platform.openai.com/docs/models/gpt-6-luna
+# official_protocol = https://platform.openai.com/docs/api-reference/responses
+# verified_at = 2026-09-23
+[models."gpt-6-luna"]
+vendor = "openai"
+display_name = "gpt-6-luna"
+supported_protocols = ["openai_responses"]
+
+# official_model = https://docs.x.ai/docs/models
+# verified_at = 2026-09-23
+[models.grok-4]
+vendor = "xai"
+display_name = "Grok 4"
+supported_protocols = ["openai_chat_completions"]
+
+# official_model = https://docs.z.ai/guides/llm/glm-5.3
+# verified_at = 2026-09-23
+[models."glm-5.3"]
+vendor = "zhipu"
+display_name = "glm-5.3"
+supported_protocols = ["openai_chat_completions", "openai_responses", "claude_messages"]
+
+# official_model = https://docs.z.ai/guides/llm/glm-5.3
+# verified_at = 2026-09-23
+[models."glm-5.3-flash"]
+vendor = "zhipu"
+display_name = "glm-5.3-flash"
+supported_protocols = ["openai_chat_completions"]
+
+# 模型生命周期（流程见 docs/architecture/model-catalog-lifecycle.md）：
+# 1. 计划下线：在 [deprecated_models] 登记并给出 replaced_by，模型仍保留在 [models]，至少保留一个发布版本。
+# 2. 正式下线：从 [models] 删除，同时登记到 [retired_models]。墓碑永不删除，客户端据此提示用户清理残留配置。
+# replaced_by 必须是未弃用的内置模型；没有明确同系列后继时留空。
+[deprecated_models]
+
+[retired_models]
+"claude-fable-5" = {}
+"claude-opus-4-1" = { replaced_by = "claude-opus-5-5" }
+"claude-opus-4-5" = { replaced_by = "claude-opus-5-5" }
+"claude-opus-4-7" = { replaced_by = "claude-opus-5-5" }
+"claude-opus-4-8" = { replaced_by = "claude-opus-5-5" }
+"claude-opus-5" = { replaced_by = "claude-opus-5-5" }
+"claude-sonnet-5" = { replaced_by = "claude-sonnet-5-5" }
+"deepseek-chat" = {}
+"deepseek-coder" = {}
+"deepseek-reasoner" = {}
+"glm-4.5" = { replaced_by = "glm-5.3" }
+"glm-4.5-air" = { replaced_by = "glm-5.3" }
+"glm-4.7" = { replaced_by = "glm-5.3" }
+"glm-5" = { replaced_by = "glm-5.3" }
+"glm-5.1" = { replaced_by = "glm-5.3" }
+"gpt-4.1" = {}
+"gpt-5.3-chat-latest" = {}
+"gpt-5.3-codex-spark" = { replaced_by = "gpt-5.3-codex" }
+"gpt-5.4" = {}
+"gpt-5.4-mini" = {}
+"gpt-5.5" = {}
+"gpt-5.6-luna" = { replaced_by = "gpt-6-luna" }
+"gpt-5.6-sol" = { replaced_by = "gpt-6-sol" }
+"gpt-5.6-terra" = {}
+"gpt-image-2" = {}
+"grok-3" = { replaced_by = "grok-4" }

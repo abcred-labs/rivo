@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rivo.invalid/a2a/rivo-a2a-lan-v1/claim-response.schema.json",
+  "title": "Rivo LAN pairing claim response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "request_id", "peer_id", "certificate_chain_pem", "expires_at"],
+  "properties": {
+    "version": {"const": "rivo-a2a-lan-v1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "peer_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "certificate_chain_pem": {"type": "string", "minLength": 1, "maxLength": 32768},
+    "expires_at": {"type": "string", "format": "date-time"}
+  }
+}

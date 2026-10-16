@@ -1,0 +1,51 @@
+[package]
+name = "rivo-tools"
+description = "Rivo 受策略保护的本地工具运行时"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+base64.workspace = true
+hex.workspace = true
+libc.workspace = true
+keyring.workspace = true
+rivo-core = { path = "../core" }
+rivo-policy = { path = "../policy" }
+rand_core.workspace = true
+regex.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+png.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Storage_Xps",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Accessibility",
+    "Win32_System_Com",
+    "Win32_System_Ole",
+    "Win32_System_StationsAndDesktops",
+    "Win32_System_Variant",
+    "Win32_System_Threading",
+    "Win32_System_JobObjects",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_Security",
+] }
+futures.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Win32_Foundation",
+    "Win32_System_Com",
+    "Win32_UI_Accessibility",
+] }

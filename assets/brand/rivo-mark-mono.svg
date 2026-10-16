@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Rivo monochrome mark</title>
+  <desc id="desc">A monochrome symmetric four-way flow mark.</desc>
+  <g fill="none" stroke="#1F2328" stroke-linecap="round" stroke-linejoin="round" stroke-width="24">
+    <path d="M128 36V78Q128 96 146 96H176"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(90 128 128)"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(180 128 128)"/>
+    <path d="M128 36V78Q128 96 146 96H176" transform="rotate(270 128 128)"/>
+  </g>
+</svg>

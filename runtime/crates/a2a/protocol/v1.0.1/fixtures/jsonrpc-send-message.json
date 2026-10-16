@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": "fixture-send-message-1",
+  "method": "message/send",
+  "params": {
+    "message": {
+      "messageId": "fixture-message-1",
+      "role": "user",
+      "parts": [{ "kind": "text", "text": "fixture request" }]
+    }
+  }
+}

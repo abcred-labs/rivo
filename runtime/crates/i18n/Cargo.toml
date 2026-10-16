@@ -1,0 +1,25 @@
+[package]
+name = "rivo-i18n"
+description = "Rivo UI 语言资源加载、校验与回退"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+dirs.workspace = true
+fluent-bundle.workspace = true
+fluent-syntax.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+unic-langid.workspace = true
+
+[dev-dependencies]
+rcgen = { version = "0.13", features = ["x509-parser"] }
+rustls.workspace = true
+tokio.workspace = true
+tokio-rustls = "0.26"

@@ -1,0 +1,23 @@
+# Public live test harness example. Replace every endpoint, model, and credential reference
+# with values you control before running it. Never commit real credentials.
+
+[[targets]]
+id = "openai-chat"
+protocol = "openai_chat_completions"
+model = "gpt-4o-mini"
+base_url = "https://api.openai.com/v1"
+credential_name = "example-openai-key"
+
+[[targets]]
+id = "openai-responses"
+protocol = "openai_responses"
+model = "gpt-4o-mini"
+base_url = "https://api.openai.com/v1"
+credential_name = "example-openai-key"
+
+[[targets]]
+id = "claude-messages"
+protocol = "claude_messages"
+model = "claude-3-5-sonnet-latest"
+base_url = "https://api.anthropic.com"
+credential_name = "example-anthropic-key"

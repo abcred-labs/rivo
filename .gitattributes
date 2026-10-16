@@ -1,0 +1,6 @@
+# Keep source and documentation line endings stable across hosts.
+.gitattributes text eol=lf
+*.md text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.ftl text eol=lf

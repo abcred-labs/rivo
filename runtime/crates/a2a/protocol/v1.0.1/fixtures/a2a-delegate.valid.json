@@ -1,0 +1,1 @@
+{"peer_id":"peer-01HVALID","skill_id":"research","message":"Summarize the supplied public material.","stream":false,"artifacts":[{"kind":"text","name":"brief.txt","content":"public context"},{"kind":"json","name":"constraints.json","content":"{\"limit\":3}"}]}

@@ -1,0 +1,14 @@
+[package]
+name = "rivo-test-support"
+description = "Rivo 自动化测试共享 fixture 与 CLI runner"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+
