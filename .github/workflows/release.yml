@@ -27,7 +27,7 @@ jobs:
             platform: linux
             arch: arm64
             binary: runtime/target/release/rivo
-          - os: macos-13
+          - os: macos-15-intel
             platform: macos
             arch: amd64
             binary: runtime/target/release/rivo
