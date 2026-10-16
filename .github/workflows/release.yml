@@ -8,8 +8,32 @@ permissions:
   contents: write
 
 jobs:
+  verify:
+    name: Verify release source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Format
+        working-directory: runtime
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        working-directory: runtime
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test
+        working-directory: runtime
+        run: cargo test --workspace --all-targets --locked
+      - name: Repository checks
+        run: |
+          python -m compileall -q scripts packaging
+          python scripts/check_markdown_links.py
+          python scripts/package-test.py
+
   package:
     name: Package ${{ matrix.platform }}-${{ matrix.arch }}
+    needs: verify
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
