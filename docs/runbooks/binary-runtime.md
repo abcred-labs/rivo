@@ -2,7 +2,7 @@
 
 ## 获取发布包
 
-从 [GitHub Releases](https://github.com/abcred-labs/rivo/releases) 下载与你的平台匹配的归档、`.sha256` 文件和 `release-manifest-<platform>-<arch>.json`。先验证 SHA-256，再解压并将 `rivo`（Windows 为 `rivo.exe`）放入用户自己的 PATH。
+从 [GitHub Releases](https://github.com/abcred-labs/rivo/releases) 下载与你的平台匹配的归档、`.sha256` 文件和 `release-manifest-<platform>-<arch>.json`。当前提供 Linux amd64/arm64、macOS amd64/arm64 和 Windows amd64。先验证 SHA-256，再解压并将 `rivo`（Windows 为 `rivo.exe`）放入用户自己的 PATH。
 
 ```sh
 sha256sum -c rivo-<version>-linux-amd64.tar.gz.sha256

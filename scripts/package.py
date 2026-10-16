@@ -16,6 +16,7 @@ from pathlib import Path
 SUPPORTED_TARGETS = {
     ("windows", "amd64"),
     ("macos", "amd64"),
+    ("macos", "arm64"),
     ("linux", "amd64"),
     ("linux", "arm64"),
 }

@@ -35,10 +35,10 @@ pub fn target() -> anyhow::Result<Target> {
             )
         ),
     };
-    let arch = match std::env::consts::ARCH {
-        "x86_64" => "amd64",
-        "aarch64" => "arm64",
-        other => bail!(
+    let arch = match (platform, std::env::consts::ARCH) {
+        (_, "x86_64") => "amd64",
+        ("linux" | "macos", "aarch64") => "arm64",
+        (_, other) => bail!(
             "{}",
             ui::text_with(
                 "cli-upgrade-arch-unsupported",

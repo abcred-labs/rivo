@@ -1,6 +1,6 @@
 # Rivo CLI 安装
 
-GitHub Releases 提供 Linux amd64、macOS amd64、Linux arm64 和 Windows amd64 归档。发布资产包含归档、`.sha256` 校验文件以及对应的 `release-manifest-<platform>-<arch>.json`。
+GitHub Releases 提供 Linux amd64、Linux arm64、macOS amd64、macOS arm64 和 Windows amd64 归档。发布资产包含归档、`.sha256` 校验文件以及对应的 `release-manifest-<platform>-<arch>.json`。
 
 ## 下载与校验
 

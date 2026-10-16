@@ -76,7 +76,12 @@ def main() -> int:
         assert f"rivo-{version}-windows-amd64/share/rivo/languages/en-US.ftl" in names
         assert f"rivo-{version}-windows-amd64/share/rivo/languages/zh-CN.ftl" in names
 
-        for platform, arch in (("macos", "amd64"), ("linux", "amd64")):
+        for platform, arch in (
+            ("macos", "amd64"),
+            ("macos", "arm64"),
+            ("linux", "amd64"),
+            ("linux", "arm64"),
+        ):
             subprocess.run(
                 [
                     sys.executable,
