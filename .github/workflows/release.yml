@@ -16,6 +16,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - name: Resolve release version
+        id: release
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must be v<major>.<minor>.<patch>; got $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Format
         working-directory: runtime
         run: cargo fmt --all -- --check
@@ -64,15 +74,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - name: Resolve release version
+        id: release
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must be v<major>.<minor>.<patch>; got $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Build release binary
         working-directory: runtime
+        env:
+          RIVO_RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: cargo build --release --locked
       - name: Package archive
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ steps.release.outputs.version }}
         shell: bash
         run: |
-          version="${VERSION#v}"
+          version="$VERSION"
           python scripts/package.py \
             --binary "${{ matrix.binary }}" \
             --version "$version" \
