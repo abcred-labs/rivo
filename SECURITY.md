@@ -2,7 +2,7 @@
 
 请不要在公开 issue、Pull Request、日志或报告中提交 API key、Credential、私钥、会话数据库或用户数据。
 
-发现可能影响用户的安全问题，请通过 GitHub 仓库维护者提供的私密渠道报告，并包含：
+发现可能影响用户的安全问题，请通过 [GitHub Private Vulnerability Reporting](https://github.com/abcred-labs/rivo/security/advisories/new) 私密报告，并包含：
 
 - 受影响的版本或提交；
 - 复现步骤和影响范围；
