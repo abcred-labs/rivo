@@ -26,6 +26,39 @@ def cargo_version() -> str:
     return match.group(1)
 
 
+def check_manifest(output: Path, version: str, platform: str, arch: str) -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "release_manifest.py"),
+            "--directory",
+            str(output),
+            "--version",
+            version,
+            "--platform",
+            platform,
+            "--arch",
+            arch,
+            "--commit",
+            "0123456789abcdef",
+        ],
+        cwd=ROOT,
+        check=True,
+        stdout=subprocess.DEVNULL,
+    )
+    manifest = json.loads(
+        (output / f"release-manifest-{platform}-{arch}.json").read_text(encoding="utf-8")
+    )
+    archive_name = f"rivo-{version}-{platform}-{arch}.{'zip' if platform == 'windows' else 'tar.gz'}"
+    archive = output / archive_name
+    assert manifest["schema"] == 2
+    assert manifest["product"] == "rivo"
+    assert manifest["platform"] == platform
+    assert manifest["arch"] == arch
+    assert manifest["artifacts"][0]["file"] == archive_name
+    assert manifest["artifacts"][0]["sha256"] == hashlib.sha256(archive.read_bytes()).hexdigest()
+
+
 def main() -> int:
     version = cargo_version()
     with tempfile.TemporaryDirectory(prefix="rivo-package-test-") as directory:
@@ -74,6 +107,7 @@ def main() -> int:
         assert f"rivo-{version}-windows-amd64/share/rivo/brand/rivo.ico" in names
         assert f"rivo-{version}-windows-amd64/share/rivo/brand/rivo.icns" in names
         assert f"rivo-{version}-windows-amd64/share/rivo/languages/en-US.ftl" in names
+        check_manifest(output, version, "windows", "amd64")
         assert f"rivo-{version}-windows-amd64/share/rivo/languages/zh-CN.ftl" in names
 
         for platform, arch in (
@@ -112,6 +146,7 @@ def main() -> int:
             assert f"{prefix}/share/rivo/brand/rivo.icns" in names
             assert f"{prefix}/share/rivo/languages/en-US.ftl" in names
             assert f"{prefix}/share/rivo/languages/zh-CN.ftl" in names
+            check_manifest(output, version, platform, arch)
         rejected = subprocess.run(
             [
                 sys.executable,
