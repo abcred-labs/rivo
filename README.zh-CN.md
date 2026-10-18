@@ -22,6 +22,8 @@ Rivo 面向本地 Workspace 中用户可见的工作。每个工具请求在执�
 
 前置条件：Git、rustup、Python 3.11+；浏览器扩展测试需要 Node.js 22；Windows 构建还需要带 C++ 和 Windows SDK 的 Visual Studio Build Tools。
 
+Linux 需要 C/C++ 工具链、CMake、pkg-config 和 D-Bus 头文件（Ubuntu：`sudo apt-get install build-essential cmake pkg-config libdbus-1-dev`）；运行 Linux 归档需 `libdbus-1.so.3`。macOS 需要 Xcode Command Line Tools。
+
 ```powershell
 Set-Location runtime
 cargo build --workspace --all-targets --locked

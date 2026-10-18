@@ -91,6 +91,7 @@ def main() -> int:
 
         version = run("--version").strip()
         assert re.search(rf"\b{re.escape(args.version)}\b", version), version
+        assert f"({manifest['commit']})" in version, "binary commit differs from release manifest"
         assert "Usage" in run("--help")
         assert run("--language", "zh-CN", "--help")
         run("config", "validate")

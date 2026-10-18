@@ -20,7 +20,7 @@ cd rivo-<version>-linux-amd64
 export PATH="$PWD:$PATH"
 ~~~
 
-On macOS, use `shasum -a 256 -c` instead of `sha256sum -c`.
+On macOS, use `shasum -a 256 -c` instead of `sha256sum -c`. Linux requires glibc and the system D-Bus library (`libdbus-1.so.3`, provided by `libdbus-1-3` on Ubuntu); musl/Alpine is not a supported archive target.
 
 Keep the extracted directory together: it contains LICENSE, complete dependency licenses in `share/rivo/licenses/`, language files and, on Windows, the browser extension host and extension resources. Linux and macOS archives provide the CLI/TUI; Windows additionally provides Windows Terminal, Computer Use and browser-extension integrations. Archives are unsigned; checksums verify file integrity and do not provide publisher authentication.
 

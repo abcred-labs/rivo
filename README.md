@@ -25,6 +25,7 @@ Prerequisites:
 - Git and [rustup](https://rustup.rs/); the repository toolchain is pinned in [rust-toolchain.toml](rust-toolchain.toml).
 - Python 3.11+ for repository checks; Node.js 22 for browser-extension tests.
 - Windows builds require Visual Studio Build Tools with C++ and a Windows SDK.
+- Linux builds require a C/C++ toolchain, CMake, pkg-config and D-Bus headers (Ubuntu: `sudo apt-get install build-essential cmake pkg-config libdbus-1-dev`); running the archive requires `libdbus-1.so.3`. macOS requires Xcode Command Line Tools.
 
 ```powershell
 Set-Location runtime

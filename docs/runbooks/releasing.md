@@ -26,10 +26,10 @@ python scripts/generate_licenses.py --check
 | 目标 | 原生构建 runner | 归档 |
 | --- | --- | --- |
 | Windows amd64 | windows-latest | ZIP |
-| Linux amd64 | ubuntu-latest | tar.gz |
+| Linux amd64 | ubuntu-24.04 | tar.gz |
 | Linux arm64 | ubuntu-24.04-arm | tar.gz |
 | macOS amd64 | macos-15-intel | tar.gz |
-| macOS arm64 | macos-latest | tar.gz |
+| macOS arm64 | macos-15 | tar.gz |
 
 Release 在各 runner 构建 release 二进制、打包并执行 `scripts/release_smoke.py`。该检查解压归档，在隔离配置、数据目录和工作区中验证：
 
@@ -41,7 +41,7 @@ Release 在各 runner 构建 release 二进制、打包并执行 `scripts/releas
 
 各报告随 Release 资产保留。任何失败阻止草稿创建，不允许只验证假二进制就宣布原生构件可用。真实浏览器、交互 TUI、实际模型服务和跨节点 A2A 仍需要相应环境单独验收；默认 Rust 测试中标为 ignored 的项目不算通过。
 
-Windows 系统集成面向 Windows 11 x64。Linux/macOS 提供通用 CLI/TUI，未包含 Windows 专属 Computer Use 和浏览器扩展接线。Linux 使用 GNU/glibc 目标，不支持将其当作 musl/Alpine 包。runner smoke 不证明所有旧发行版、旧 macOS 或终端均兼容；当前不承诺这些系统的最低版本。所有归档未做平台代码签名，SHA-256 仅校验完整性。
+Windows 系统集成面向 Windows 11 x64。Linux/macOS 提供通用 CLI/TUI，未包含 Windows 专属 Computer Use 和浏览器扩展接线。Linux 使用 GNU/glibc 目标，运行时需要 `libdbus-1.so.3`（Ubuntu 的 `libdbus-1-3`）；源码构建另需 `libdbus-1-dev`、`pkg-config`、C/C++ 工具链和 CMake。不支持将其当作 musl/Alpine 包。runner smoke 不证明所有旧发行版、旧 macOS 或终端均兼容；当前不承诺这些系统的最低版本。所有归档未做平台代码签名，SHA-256 仅校验完整性。
 
 ## 3. 先准备草稿，再公开发布
 
