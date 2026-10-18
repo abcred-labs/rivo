@@ -1,41 +1,41 @@
-# 模型路由
+# Model routing
 
-- 适用版本：V1 Windows 11 x64 本地预览。
-- 接口边界：路由规则见[地址归属契约](../../architecture/provider-endpoint-ownership.md)。
+A route contains one Vendor, one canonical Model, and one Provider. The Model supplies the request protocol; the Provider supplies `base_url`, authentication and Provider priority. Runtime commands cannot override the URL or Credential with ad-hoc values.
 
-路由选择一个 Vendor、一个 canonical Model 和一个 Provider。运行请求使用被选 Model 的首选协议，以及被选 Provider 的地址和认证引用，不能用运行时 URL 或认证参数覆盖。
+## Set defaults
 
-## 设置默认选择
-
-```powershell
+```text
 rivo config set vendor <vendor-id>
 rivo config set model <canonical-model-id>
 rivo config set provider_id <provider-id>
-```
-
-取消默认显式 Provider 后回到 Auto：
-
-```powershell
 rivo config unset provider_id
 ```
 
-也可在单次运行时使用 `--vendor`、`--model`、`--provider-id`；`--auto-provider` 与 `--provider-id` 互斥。
+`unset provider_id` returns the default to Auto. A single run can override the defaults with `--vendor`, `--model`, `--provider-id`, or `--auto-provider`; `--provider-id` and `--auto-provider` are mutually exclusive.
 
-## 验证路由
+Selection precedence is CLI flags, then `RIVO_VENDOR`/`RIVO_MODEL`/`RIVO_PROVIDER_ID`, then persisted defaults. `--auto-provider` explicitly overrides a configured Provider.
 
-```powershell
+## Preview and verify
+
+```text
+rivo config validate
 rivo config model providers <canonical-model-id>
 rivo config route --vendor <vendor-id> --model <canonical-model-id> --provider-id <provider-id>
+rivo config route --vendor <vendor-id> --format json
 ```
 
-这些查询离线且只读。实际运行前，先[刷新 Provider 模型目录](provider-model-refresh.md)。
+These commands are offline and do not prove that a remote service is reachable. Run a Provider refresh before a real task.
 
-## Auto 与显式 Provider
+## Auto and explicit Provider
 
-- 未选 Model 时，按 Model priority 降序、Model ID 升序选择；选定后不会因为无可用 Provider 而更换模型。
-- Auto 按 Provider priority 降序、Provider ID 升序选择可用 Provider。
-- 指定显式 Provider 后，它不可用就立即拒绝，不回退到其他 Provider。
-- 精确 ID 不匹配、未刷新、最近刷新失败、disabled、unsupported 或配置指纹不符都会拒绝。
-- 当前没有运行期故障切换；后续 turn 会重新解析路由。
+Auto considers enabled Providers with a successful, current discovery fingerprint containing the exact Model ID. It sorts by Provider priority descending and Provider ID ascending. If no Model is specified, enabled Models are sorted by Model priority descending and Model ID ascending; Rivo does not switch Models because a selected Model is unavailable.
 
-[返回配置索引](README.md) | [Provider 管理](provider-management.md)
+An explicit Provider must be usable for the selected Model or the route fails immediately. Rivo has no runtime failover after a request starts. Discovery becomes invalid when the Provider URL or Credential reference changes; changing Model protocol preferences does not invalidate it.
+
+A route is usable only when the Model is enabled, has at least one protocol, the Provider is enabled, discovery succeeded, the configuration fingerprint matches, and discovery contains the exact canonical ID.
+
+[Configuration index](README.md) | [Provider management](provider-management.md) | [Provider model refresh](provider-model-refresh.md)
+
+---
+
+[简体中文](model-routing.zh-CN.md)

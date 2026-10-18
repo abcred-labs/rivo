@@ -524,9 +524,6 @@ cli-upgrade-download-http-failed = 下载安装包返回 HTTP {$status}
 cli-upgrade-package-read-failed = 读取安装包失败
 cli-upgrade-checksum-mismatch = 安装包 checksum 不匹配：expected {$expected}，got {$actual}
 cli-upgrade-temp-write-failed = 写入临时安装包失败：{$path}
-cli-upgrade-installer-unsupported = 不支持的安装器平台：{$platform}
-cli-upgrade-installer-start-failed = 启动原生安装器失败
-cli-upgrade-installer-failed = 原生安装器失败，退出状态：{$status}
 cli-upgrade-semver-invalid = 版本号不是受支持的 SemVer：{$value}
 cli-sessions-path-help = 显示本地会话数据库路径。
 
@@ -779,7 +776,7 @@ cli-config-unset-help = 清除配置项。
     选项：-h、--help  显示帮助
 cli-config-route-help = 预览 Vendor/Model 路由，不发起调用。
 
-    用法：rivo config route --vendor <VENDOR> [--model <MODEL>]
+    用法：rivo config route --vendor <VENDOR> [--model <MODEL>] [--provider-id <PROVIDER>]
 
     选项：-h、--help  显示帮助
 cli-config-vendor-help = 管理本地 Vendor 目录。
@@ -795,6 +792,11 @@ cli-config-model-help = 管理规范 Model 目录。
 cli-config-provider-help = 管理 Provider 连接。
 
     用法：rivo config provider <list|show|set|remove> [ARGS]
+
+    选项：-h、--help  显示帮助
+cli-config-provider-set-help = 管理 Provider 连接。
+
+    用法：rivo config provider set <ID> --base-url <URL> [--credential-name <NAME>] [--enabled <BOOL>] [--priority <N>] [--refresh] [--confirm <TOKEN>]
 
     选项：-h、--help  显示帮助
 cli-config-credentials-path-help = 显示 Credential 文件路径。
@@ -836,7 +838,7 @@ cli-config-provider-not-found = Provider 不存在：{$id}
 cli-config-vendor-not-found = Vendor 不存在：{$id}
 cli-config-model-not-found = Model 不存在：{$id}
 cli-config-show-id-missing = show 需要 ID
-cli-config-route-usage = 用法：rivo config route --vendor <vendor> [--model <model>]
+cli-config-route-usage = 用法：rivo config route --vendor <vendor> [--model <model>] [--provider-id <provider>]
 cli-output-field = 字段
 cli-config-set-usage = 用法：rivo config {$command} <key> [value]
 cli-config-value-missing = 缺少 {$key} 的值

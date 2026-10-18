@@ -524,9 +524,6 @@ cli-upgrade-download-http-failed = Package download returned HTTP {$status}
 cli-upgrade-package-read-failed = Failed to read the package
 cli-upgrade-checksum-mismatch = Package checksum mismatch: expected {$expected}, got {$actual}
 cli-upgrade-temp-write-failed = Failed to write temporary package: {$path}
-cli-upgrade-installer-unsupported = Unsupported installer platform: {$platform}
-cli-upgrade-installer-start-failed = Failed to start the native installer
-cli-upgrade-installer-failed = Native installer failed with exit status: {$status}
 cli-upgrade-semver-invalid = Version is not a supported SemVer: {$value}
 cli-sessions-path-help = Show the local session database path.
 
@@ -779,7 +776,7 @@ cli-config-unset-help = Unset a configuration value.
     Options: -h, --help  Show help
 cli-config-route-help = Preview deterministic Vendor/Model routing without making a request.
 
-    Usage: rivo config route --vendor <VENDOR> [--model <MODEL>]
+    Usage: rivo config route --vendor <VENDOR> [--model <MODEL>] [--provider-id <PROVIDER>]
 
     Options: -h, --help  Show help
 cli-config-vendor-help = Manage the local Vendor catalog.
@@ -795,6 +792,11 @@ cli-config-model-help = Manage the canonical Model catalog.
 cli-config-provider-help = Manage Provider connections.
 
     Usage: rivo config provider <list|show|set|remove> [ARGS]
+
+    Options: -h, --help  Show help
+cli-config-provider-set-help = Manage Provider connections.
+
+    Usage: rivo config provider set <ID> --base-url <URL> [--credential-name <NAME>] [--enabled <BOOL>] [--priority <N>] [--refresh] [--confirm <TOKEN>]
 
     Options: -h, --help  Show help
 cli-config-credentials-path-help = Show the credential file path.
@@ -836,7 +838,7 @@ cli-config-provider-not-found = Provider not found: {$id}
 cli-config-vendor-not-found = Vendor not found: {$id}
 cli-config-model-not-found = Model not found: {$id}
 cli-config-show-id-missing = show requires an ID
-cli-config-route-usage = Usage: rivo config route --vendor <vendor> [--model <model>]
+cli-config-route-usage = Usage: rivo config route --vendor <vendor> [--model <model>] [--provider-id <provider>]
 cli-output-field = Field
 cli-config-set-usage = Usage: rivo config {$command} <key> [value]
 cli-config-value-missing = Missing value for {$key}

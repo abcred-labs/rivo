@@ -1,60 +1,61 @@
-# Model 管理
+# Model management
 
-- 适用版本：V1 Windows 11 x64 本地预览。
-- 接口边界：canonical Model 与自动路由的规则以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准。
+A Model is a canonical catalog identity. It owns the Vendor, display name, enabled state, priority, reasoning support, and ordered `supported_protocols`. It does not own a URL, Credential, or Provider mapping.
 
-Model 是模型目录身份，不保存 Provider 地址、认证或人工映射。canonical Model ID 区分大小写，且前后缀必须与 Provider discovery 返回的完整 ID 精确一致。
+Model IDs are case-sensitive and must exactly match the full ID returned by Provider discovery. Rivo does not add aliases, strip prefixes, or rewrite the request model ID.
 
-Model 同时决定请求协议：`supported_protocols` 是按偏好排序的列表，路由始终使用第一项，与 Provider 无关。
+## Inspect the catalog
 
-## 查看目录
-
-```powershell
+```text
 rivo config model list
-rivo config model show <canonical-model-id>
-```
-
-内置 Model 的 `vendor` 与 `display_name` 只读；本地可以覆盖其协议列表与 priority，`list` 中来源显示为 `BuiltinOverride`。
-
-## 调整模型协议
-
-内置目录提供默认协议顺序：OpenAI 多协议模型 Responses 优先，DeepSeek、GLM 等多协议模型 Chat Completions 优先，Anthropic 模型仅 Messages。需要时可对内置或自定义 Model 增加、禁用或重排协议：
-
-```powershell
-# 追加协议（已存在则忽略）
-rivo config model set <canonical-model-id> --enable-protocol claude_messages
-# 禁用协议；不能禁用最后一个
-rivo config model set <canonical-model-id> --disable-protocol openai_responses,claude_messages
-# 整体替换并指定偏好顺序
-rivo config model set <canonical-model-id> --protocols claude_messages,openai_chat_completions
-```
-
-三种参数都基于当前有效列表计算，并把完整列表写入本地 `[models.<id>]` 覆盖；省略 `--vendor`、`--display-name` 时沿用内置或已有值。覆盖对所有 Provider 生效，例如某套餐入口只提供 Chat Completions 时，可在该模型上禁用其他协议。调整协议不会使 Provider discovery 失效。
-
-## 创建或维护自定义 Model
-
-仅在目录中不存在目标 ID 时创建；协议列表必须按该具体 Model ID 的证据填写：
-
-```powershell
-rivo config model set <canonical-model-id> --vendor <vendor-id> --display-name <model-display-name> --protocols openai_chat_completions,openai_responses --priority 100
-```
-
-`--vendor` 必须引用有效 Vendor。`--protocols` 是非空、无重复的逗号分隔列表，顺序即偏好，只能使用 `openai_chat_completions`、`openai_responses`、`claude_messages`；不能按 Vendor 或模型名前缀推断。priority 范围为 `0..=1000`；未显式选择 Model 时，系统按 priority 降序、Model ID 升序选择，不会因该 Model 暂无可用 Provider 自动改选其他 Model。
-
-## 确认可用 Provider
-
-```powershell
+rivo config model list --vendor <vendor-id> --state enabled --format table
+rivo config model show <canonical-model-id> --format json
 rivo config model providers <canonical-model-id>
 ```
 
-结果来自已刷新 Provider 的精确 ID 匹配。没有 alias、请求 ID 重写或人工 Provider mapping。
+`--state` accepts `enabled`, `disabled`, or `all` (the default). `list` and `show` are offline. `model providers` reports Providers whose successful discovery contains the exact ID.
 
-## 删除前检查
+## Create a custom Model
 
-```powershell
-rivo config model remove <canonical-model-id>
+```text
+rivo config vendor set acme --display-name "Acme AI"
+rivo config model set acme-chat \
+  --vendor acme \
+  --display-name "Acme Chat" \
+  --protocols openai_chat_completions,openai_responses \
+  --reasoning default,low,medium \
+  --priority 100
 ```
 
-先阅读影响计划再确认。删除不能留下默认选择或目录引用不完整的配置。
+A custom entry requires an existing Vendor, a non-empty protocol list without duplicates, and a priority from `0` through `1000`. Protocol order is the preference order. Use evidence for the exact Model ID and the endpoint's actual protocol support; discovery alone cannot infer either.
 
-[返回配置索引](README.md) | [刷新 Provider 模型目录](provider-model-refresh.md) | [模型路由](model-routing.md)
+When updating an existing built-in or local Model, omitted fields keep their current values. `vendor` and `display-name` are required only when creating an entry.
+
+## Change protocols and enabled state
+
+```text
+rivo config model set <model-id> --enable-protocol claude_messages
+rivo config model set <model-id> --disable-protocol openai_responses,claude_messages
+rivo config model set <model-id> --protocols claude_messages,openai_chat_completions
+rivo config model disable <model-id> [<model-id>...]
+rivo config model enable <model-id> [<model-id>...]
+```
+
+The last enabled protocol cannot be removed. Built-in changes are stored as local overrides. Changing Model protocols does not invalidate Provider discovery, but the selected first protocol can change the request endpoint.
+
+Disabled Models do not participate in default selection. Explicitly selecting a disabled Model fails. Batch enable/disable is one atomic local update; unknown IDs are reported as `missing` while valid IDs continue.
+
+## Remove a Model
+
+```text
+rivo config model remove <canonical-model-id>
+rivo config model remove <canonical-model-id> --yes
+```
+
+Removal shows an impact plan and requires interactive confirmation unless `--yes` is supplied. Defaults and catalog references must remain valid. Provider discovery and Credential objects are not deleted as a side effect.
+
+[Configuration index](README.md) | [Vendor management](vendor-management.md) | [Model routing](model-routing.md)
+
+---
+
+[简体中文](model-management.zh-CN.md)

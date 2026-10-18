@@ -1,28 +1,25 @@
-# 配置故障排查
+# Configuration troubleshooting
 
-- 适用版本：V1 Windows 11 x64 本地预览。
-- 接口边界：schema 6 以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准，用户文件升级以[持久化文件兼容与自动升级契约](../../architecture/persistence-file-compatibility.md)为准。
-
-## 症状与处理
-
-| 症状 | 原因或检查点 | 处理 |
+| Symptom | What it means | Action |
 | --- | --- | --- |
-| 配置升级失败 | 文件损坏、迁移后仍有未知/冲突字段，或文件来自未来版本。 | 保留原文件并查看脱敏错误；不要手工覆盖。已支持历史格式应在迁移器交付后自动升级，未来版本必须使用较新的 Rivo。 |
-| Model 未出现在 Provider 列表 | 未刷新，或完整 ID 不匹配。 | 刷新 Provider；核对大小写和前后缀，不使用 alias。 |
-| refresh 返回 `401/403` | Provider Credential 缺失、错误或权限不足。 | 检查 Provider 的 Credential 引用及其权限，再刷新；refresh 不读取 turn 的环境变量。 |
-| provider set 拒绝 Credential | 指定的 Credential 名称不存在。 | 先执行 `rivo config credentials show`，再使用已有名称，或先创建 Credential。 |
-| Credential 无法删除 | 仍有 Provider 引用该 Credential。 | 先更新或移除对应 Provider，再执行 `config credentials unset`。 |
-| turn 认证失败或未使用预期 key | 运行时环境变量缺失、空白或不可读取。 | 使用 `rivo run --api-key-env <name>` 指定变量名；缺失时会回退 Provider Credential。若 env 已有值但服务返回 `401/403`，不会切换 Credential。 |
-| refresh 返回 `404/unsupported` | 目录发现接口地址不支持。 | 核对 `base_url`；此结果不能绕过 discovery 直接运行。 |
-| 运行返回 404 或协议错误 | 入口不提供该 Model 首选协议。 | 用 `config model set <id> --disable-protocol` 或 `--protocols` 调整模型协议顺序。 |
-| 路由被拒绝 | Provider disabled、刷新失败、指纹不符或不含精确 Model ID。 | 用 `provider show` 查看脱敏状态；修复连接后重新刷新。 |
-| `validate` 通过但仍不能运行 | `validate` 只验证本地结构。 | 执行 refresh，并用 `config route` 与最小真实请求验证。 |
-| 更新/删除无法提交 | 影响计划未确认，或 revision 已变更。 | 重新生成计划，核对影响后使用新的确认信息。 |
-| 旧配置或旧会话不能恢复 | 文件不在支持的历史格式中、无法安全迁移，或 SQLite 会话 schema 不受配置迁移规范覆盖。 | 对已支持历史 `config.toml`、`credentials.toml`、`instances.json` 使用自动升级；只有旧会话 schema 或无法安全迁移的文件按受控流程处理，并保留 Credential、记忆、MCP 和 A2A 数据。 |
+| `validate` passes but a run is rejected | `validate` checks local structure only. | Refresh the Provider, then run `config route` and a minimal request. |
+| Model is missing from Provider results | Discovery is stale or the ID is not exact. | Refresh and compare case, prefix and suffix; do not use an alias. |
+| Refresh returns 401/403 | Credential is missing, invalid or unauthorized. | Check the Provider Credential reference and permissions, then refresh. |
+| Refresh returns 404/unsupported | The model directory endpoint is not supported at this base URL. | Correct `base_url` or use a Provider that supports discovery; do not bypass refresh. |
+| `provider set` rejects a Credential | The named Credential does not exist. | Run `config credentials show` or create it first. |
+| Credential cannot be removed | A Provider still references it. | Update or remove every referencing Provider. |
+| Request uses the wrong protocol | The Model's first protocol is wrong for the gateway. | Change `--protocols` or disable the unsupported protocol, then retry. |
+| Route has no Provider | The Provider is disabled, unrefreshed, stale, or lacks the exact Model ID. | Inspect `provider show`, fix the connection and refresh. |
+| Update asks for confirmation | A URL or Credential change affects a route. | Review the printed plan and repeat the same command with its fresh `--confirm` token. |
+| TUI cannot start | stdin/stdout is not an interactive terminal. | Run it in a local terminal; use `rivo run --format jsonl` for automation. |
 
-## 最小检查序列
+## Failure handling
 
-```powershell
+Treat every rejected route, authentication response, discovery error, and TUI startup failure as actionable diagnostics. Preserve the redacted error summary, fix the named configuration or terminal condition, then repeat validation and refresh; never paste credentials into an issue report.
+
+## Minimal diagnostic sequence
+
+```text
 rivo config validate
 rivo config provider show <provider-id>
 rivo config provider models refresh <provider-id>
@@ -30,6 +27,10 @@ rivo config model providers <canonical-model-id>
 rivo config route --vendor <vendor-id> --model <canonical-model-id> --provider-id <provider-id>
 ```
 
-避免将密钥粘贴到诊断输出、命令行或问题报告中。
+Keep API keys out of diagnostics, shell history and issue reports.
 
-[返回配置索引](README.md) | [刷新 Provider 模型目录](provider-model-refresh.md) | [二进制包运行手册](../../runbooks/binary-runtime.md)
+[Configuration index](README.md) | [Provider model refresh](provider-model-refresh.md) | [Binary runtime](../../runbooks/binary-runtime.md)
+
+---
+
+[简体中文](troubleshooting.zh-CN.md)

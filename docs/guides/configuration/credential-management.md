@@ -1,37 +1,49 @@
-# Credential 管理
+# Credential management
 
-- 适用版本：V1 Windows 11 x64 本地预览。
-- 接口边界：模型路由见[地址归属契约](../../architecture/provider-endpoint-ownership.md)。
+A Credential is a local authentication secret referenced by a Provider. Rivo never prints the secret and does not place it in `config.toml`, command arguments, logs, diagnostics, or session history.
 
-Credential 是独立的本地认证存储。它不会显示 API Key 正文，也不应将密钥写入命令行、脚本、`config.toml`、日志或仓库。
+## Save and inspect a Credential
 
-## 创建与检查
-
-```powershell
+```text
+rivo config credentials path
 rivo config credentials set <credential-name>
 rivo config credentials show
 ```
 
-创建时按提示进行两次隐藏输入。名称只可使用 ASCII 字母、数字、`_` 和 `-`。`show` 只显示名称和保存状态。
+Interactive `set` asks for the value twice with masked input. Names may contain only ASCII letters, digits, `_`, and `-`. `show` lists names and storage state; it never displays secret text.
 
-## 选择认证方式
+For automation, read the value from an environment variable without putting it in the command line:
 
-Provider 认证引用只能二选一：
+```text
+rivo config credentials set openai-key --from-env OPENAI_API_KEY
+```
 
-| 方式 | 使用场景 | Provider 参数 |
-| --- | --- | --- |
-| Credential | 将凭据存为本机独立引用。 | `--credential-name <credential-name>` |
-| 环境变量 | 由外部进程环境安全提供实际值。 | `rivo run --api-key-env <environment-variable-name>` |
+The environment variable is read once by the command and its name is not saved as a Provider setting.
 
-运行时非空环境变量优先；变量缺失、空白或不可读取时回退 Provider 引用的 Credential。未配置 Credential 引用时以无认证方式调用；已配置但不可读取时明确失败。Provider 只保存 Credential 名称，不保存环境变量名称或认证正文。
+## Choose runtime authentication
 
-## 删除与迁移
+A Provider can reference one stored Credential, or a run can supply an environment variable name:
 
-```powershell
+```text
+rivo config provider set gateway --base-url https://api.example.com/v1 --credential-name openai-key
+rivo run --api-key-env OPENAI_API_KEY --prompt "Reply only: ok"
+```
+
+For a run, a non-empty `--api-key-env` value has priority. If it is missing, blank, or unreadable, Rivo falls back to the Provider's Credential reference. If a configured Credential cannot be read, the run fails with a redacted error; it does not try another secret.
+
+## Migrate and remove
+
+```text
 rivo config credentials migrate
 rivo config credentials unset <credential-name>
 ```
 
-Credential 仍被 Provider 引用时不能删除；请先修正或移除引用。删除 Provider 不会自动删除 Credential。`credentials migrate` 仅处理独立凭据的加密存储，不迁移模型配置或旧会话。Credential 缺失、损坏或不可解密时，Provider set、refresh 和运行时会给出对应的脱敏错误，不会把 API key 写入 `config.toml`。
+`migrate` converts legacy plaintext credential storage to the current encrypted file format. It does not migrate model configuration or sessions. A Credential referenced by any Provider cannot be removed; update or remove those Providers first. Removing a Provider never removes its Credential.
 
-[返回配置索引](README.md) | [Provider 管理](provider-management.md)
+The file is locally obfuscated/encrypted, but it is not an OS keychain and does not protect against a compromised local account. CI and shared environments should prefer short-lived environment injection.
+
+[Configuration index](README.md) | [Provider management](provider-management.md)
+
+---
+
+[简体中文](credential-management.zh-CN.md)

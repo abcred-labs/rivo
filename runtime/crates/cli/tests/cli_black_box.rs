@@ -1156,7 +1156,11 @@ fn e2e_config_help_is_hierarchical_and_side_effect_free() {
         ),
         (
             &["config", "provider", "--help"][..],
-            &["Usage: rivo config provider"][..],
+            &["Usage: rivo config provider <list|show|set|remove> [ARGS]"][..],
+        ),
+        (
+            &["config", "provider", "set", "--help"][..],
+            &["Usage: rivo config provider set <ID>"][..],
         ),
         (
             &["config", "vendor", "--help"][..],

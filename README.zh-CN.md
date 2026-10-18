@@ -50,8 +50,15 @@ rivo tui
 
 详见[配置与测试](SOURCE_CONFIGURATION_AND_TESTING.md)、[架构说明](docs/guides/architecture-and-capabilities.md)和[Runtime 接入](docs/guides/runtime-integration.md)。
 
+交互式终端使用请参阅 [TUI 指南](docs/guides/tui.zh-CN.md)。Provider、Credential、
+Vendor 和自定义 Model 的配置见[配置指南](docs/guides/configuration/README.zh-CN.md)。
+
 ## 贡献与安全
 
 提交 Pull Request 前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。安全问题请按 [SECURITY.md](SECURITY.md) 的流程报告，不要在公开 issue 中披露凭据。
 
 Rivo 使用 [MIT License](LICENSE) 发布。第三方授权见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+---
+
+[English](README.md)

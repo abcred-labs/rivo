@@ -96,10 +96,13 @@ jobs:
         run: cargo test -p rivo-tools --lib --locked -- --test-threads=1
       - name: Markdown links
         run: python scripts/check_markdown_links.py
+      - name: Documentation language parity
+        run: python scripts/check_doc_parity.py
       - name: Python checks
         run: |
           python -m compileall -q scripts packaging
           python scripts/package-test.py
+          python scripts/install-command-test.py
           python scripts/check_browser_extension.py
       - name: Browser extension tests
         run: node --test packaging/browser-extension/tests/content-script.test.mjs packaging/browser-extension/tests/service-worker.test.mjs

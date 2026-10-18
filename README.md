@@ -53,6 +53,11 @@ rivo tui
 
 See [configuration and testing](SOURCE_CONFIGURATION_AND_TESTING.en.md), [architecture](docs/guides/architecture-and-capabilities.md), and [runtime integration](docs/guides/runtime-integration.md).
 
+For interactive terminal usage, see the [TUI guide](docs/guides/tui.md). Provider,
+Credential, Vendor and custom Model setup is covered by the
+[configuration guides](docs/guides/configuration/README.md). The same pages are
+available in [简体中文](README.zh-CN.md) and through the Chinese document links.
+
 ## Contributing and security
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Report security issues using the process in [SECURITY.md](SECURITY.md); do not disclose credentials in public issues.

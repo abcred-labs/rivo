@@ -186,7 +186,7 @@ def main() -> int:
         )
         assert missing_host.returncode != 0
         assert "Windows browser extension host missing" in missing_host.stderr
-    print("archive layout check passed; native installer layout is checked separately")
+    print("archive layout and release assets check passed")
     return 0
 
 

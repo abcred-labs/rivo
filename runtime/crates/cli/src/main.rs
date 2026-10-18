@@ -2340,6 +2340,10 @@ async fn run_config_command(args: Vec<String>) -> anyhow::Result<i32> {
     Ok(0)
 }
 
+fn config_route_help_text() -> &'static str {
+    "Preview deterministic Vendor/Model routing without making a request.\n\nUsage: rivo config route --vendor <VENDOR> [--model <MODEL>] [--provider-id <PROVIDER>]\n\nOptions: -h, --help  Show help"
+}
+
 fn print_config_help(args: &[String]) -> bool {
     let (id, fallback) = match args {
         [help] if matches!(help.as_str(), "--help" | "-h") => (
@@ -2373,7 +2377,7 @@ fn print_config_help(args: &[String]) -> bool {
             ),
             "route" => (
                 "cli-config-route-help",
-                "Preview deterministic Vendor/Model routing without making a request.\n\nUsage: rivo config route --vendor <VENDOR> [--model <MODEL>]\n\nOptions: -h, --help  Show help",
+                config_route_help_text(),
             ),
             "vendor" => (
                 "cli-config-vendor-help",
@@ -2970,6 +2974,19 @@ async fn run_model_routing_config_command(
 ) -> anyhow::Result<()> {
     let mut args = args.to_vec();
     let operation = args.first().map(String::as_str).unwrap_or("list");
+    if kind == "provider"
+        && operation == "set"
+        && matches!(args.get(1).map(String::as_str), Some("--help" | "-h"))
+    {
+        println!(
+            "{}",
+            ui::text(
+                "cli-config-provider-set-help",
+                "Manage Provider connections.\n\nUsage: rivo config provider set <ID> --base-url <URL> [--credential-name <NAME>] [--enabled <BOOL>] [--priority <N>] [--refresh] [--confirm <TOKEN>]\n\nOptions: -h, --help  Show help",
+            )
+        );
+        return Ok(());
+    }
     let format = if matches!(operation, "list" | "show") {
         parse_query_format(&mut args)?
     } else {
@@ -7122,6 +7139,7 @@ const CLI_MESSAGE_IDS: &[&str] = &[
     "cli-config-vendor-help",
     "cli-config-model-help",
     "cli-config-provider-help",
+    "cli-config-provider-set-help",
     "cli-config-credentials-path-help",
     "cli-config-credentials-show-help",
     "cli-config-credentials-set-help",
@@ -9066,6 +9084,12 @@ mod tests {
             .try_get_matches_from(["rivo"])
             .unwrap_err();
         assert_eq!(error.exit_code(), 2);
+    }
+
+    #[test]
+    fn route_help_documents_provider_override() {
+        let help = config_route_help_text();
+        assert!(help.contains("--provider-id <PROVIDER>"));
     }
 
     #[test]

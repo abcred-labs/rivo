@@ -1,31 +1,69 @@
-# 二进制包运行手册
+# Binary runtime runbook
 
-## 获取发布包
+## Obtain a release archive
 
-从 [GitHub Releases](https://github.com/abcred-labs/rivo/releases) 下载与你的平台匹配的归档、`.sha256` 文件和 `release-manifest-<platform>-<arch>.json`。当前提供 Linux amd64/arm64、macOS amd64/arm64 和 Windows amd64。先验证 SHA-256，再解压并将 `rivo`（Windows 为 `rivo.exe`）放入用户自己的 PATH。
+Download the archive, `.sha256` sidecar and matching manifest from [GitHub Releases](https://github.com/abcred-labs/rivo/releases). Supported targets are Windows amd64 ZIP, Linux amd64/arm64 tar.gz, and macOS amd64/arm64 tar.gz. Verify the checksum before extraction and keep the extracted directory intact.
 
 ```sh
 sha256sum -c rivo-<version>-linux-amd64.tar.gz.sha256
+tar -xzf rivo-<version>-linux-amd64.tar.gz
 ```
 
-macOS 使用 `shasum -a 256 -c`；Windows 使用 PowerShell 的 `Get-FileHash`。归档内包含 LICENSE、语言资源及 Windows 浏览器扩展资源。
+Use `shasum -a 256 -c` on macOS and PowerShell `Get-FileHash` on Windows. Linux archives require glibc and `libdbus-1.so.3`; the release is not a musl/Alpine package.
 
-## 升级检查
+## First checks
 
 ```text
-rivo upgrade
-```
-
-`rivo upgrade` 从 GitHub Releases 读取当前平台的 manifest，只报告是否存在新版本，不会自动重启或替换运行中的 CLI、TUI 或 app-server。可通过 `RIVO_RELEASE_BASE_URL` 指向兼容的镜像目录；镜像需要提供对应平台的 `release-manifest.json`。
-
-## 首次检查
-
-```powershell
 rivo --version
 rivo --help
 rivo config --help
 rivo config path
 rivo config credentials path
+rivo sessions path
 ```
 
-配置、Credential、模型路由和诊断流程请参阅[配置指南](../guides/configuration/README.md)与[从源码运行手册](development-runtime.md)。
+Configure a Credential, Vendor, Model and Provider as described in the
+[configuration guides](../guides/configuration/README.md). Run
+`rivo config provider models refresh <provider-id>` before a real task.
+
+## Run CLI and TUI
+
+Use `rivo run --prompt <TEXT>` or `rivo run --stdin` for headless work. Use
+`rivo tui [--workspace <PATH>]` only from an interactive terminal. TUI keyboard and
+slash commands are documented in the [TUI guide](../guides/tui.md).
+
+## Upgrade checks
+
+```text
+rivo upgrade --check
+```
+
+The V1 command reads the current platform manifest and reports whether a newer
+archive exists. It does not download, install, replace, restart, or alter a running
+CLI, TUI or app-server. `RIVO_RELEASE_BASE_URL` can point to a compatible mirror;
+the mirror must expose `<platform>-<arch>/release-manifest.json` in its directory
+layout.
+
+To upgrade, stop Rivo processes, download and verify the new archive, replace the
+old extracted binary directory, and run `rivo --version`. Published versions and
+archives are immutable; publish a new patch version for a correction.
+
+## Local data and diagnostics
+
+Configuration and Credential files are outside the archive. Use `config path`,
+`config credentials path`, and `sessions path` before backing up or removing data.
+For a redacted diagnostic bundle:
+
+```text
+rivo diagnostics create <destination-path> --yes
+```
+
+Treat diagnostics and session backups as sensitive because they may contain redacted
+business content. Never include API keys in a report.
+
+[Install guide](../guides/one-click-install.md) | [TUI guide](../guides/tui.md) |
+[Configuration guides](../guides/configuration/README.md)
+
+---
+
+[简体中文](binary-runtime.zh-CN.md)
