@@ -420,7 +420,8 @@ fn extract_archive(archive: &Path, destination: &Path, target: Target) -> anyhow
             zip::ZipArchive::new(File::open(archive)?).context("cannot read ZIP archive")?;
         for index in 0..zip.len() {
             let mut entry = zip.by_index(index)?;
-            let name = Path::new(entry.name());
+            let entry_name = entry.name()?;
+            let name = Path::new(entry_name.as_ref());
             if !safe_archive_path(name) {
                 bail!("archive contains an unsafe path");
             }

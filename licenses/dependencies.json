@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generator": "cargo-about 0.9.2",
-  "cargo_lock_sha256": "7346442378c14aeafdb06b43f8d122ac763d9e17d99813d882edb3e78402730c",
+  "cargo_lock_sha256": "3d6626b8eb69d35add1eb8d05882b4ab36a00629ed3daa0d31cfc438995abd3c",
   "targets": [
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",
@@ -417,6 +417,19 @@
       ],
       "repository": "https://github.com/katharostech/cfg_aliases",
       "source": "https://crates.io/api/v1/crates/cfg_aliases/0.1.1/download"
+    },
+    {
+      "name": "cfg_aliases",
+      "version": "0.2.1",
+      "license_expression": "MIT",
+      "selected_licenses": [
+        "MIT"
+      ],
+      "authors": [
+        "Zicklag <zicklag@katharostech.com>"
+      ],
+      "repository": "https://github.com/katharostech/cfg_aliases",
+      "source": "https://crates.io/api/v1/crates/cfg_aliases/0.2.1/download"
     },
     {
       "name": "chacha20",
@@ -2127,6 +2140,17 @@
       "source": "https://crates.io/api/v1/crates/nix/0.28.0/download"
     },
     {
+      "name": "nix",
+      "version": "0.31.3",
+      "license_expression": "MIT",
+      "selected_licenses": [
+        "MIT"
+      ],
+      "authors": [],
+      "repository": "https://github.com/nix-rust/nix",
+      "source": "https://crates.io/api/v1/crates/nix/0.31.3/download"
+    },
+    {
       "name": "nom",
       "version": "7.1.3",
       "license_expression": "MIT",
@@ -3749,6 +3773,19 @@
       "source": "https://crates.io/api/v1/crates/type-map/0.5.1/download"
     },
     {
+      "name": "typed-path",
+      "version": "0.12.3",
+      "license_expression": "MIT OR Apache-2.0",
+      "selected_licenses": [
+        "MIT"
+      ],
+      "authors": [
+        "Chip Senkbeil <chip@senkbeil.org>"
+      ],
+      "repository": "https://github.com/chipsenkbeil/typed-path",
+      "source": "https://crates.io/api/v1/crates/typed-path/0.12.3/download"
+    },
+    {
       "name": "typenum",
       "version": "1.20.1",
       "license_expression": "MIT OR Apache-2.0",
@@ -4550,7 +4587,7 @@
     },
     {
       "name": "zip",
-      "version": "2.6.1",
+      "version": "9.0.5",
       "license_expression": "MIT",
       "selected_licenses": [
         "MIT"
@@ -4561,8 +4598,19 @@
         "Ryan Levick <ryan.levick@gmail.com>",
         "Chris Hennick <hennickc@amazon.com>"
       ],
-      "repository": "https://github.com/zip-rs/zip2.git",
-      "source": "https://crates.io/api/v1/crates/zip/2.6.1/download"
+      "repository": "https://github.com/zip-rs/zip2",
+      "source": "https://crates.io/api/v1/crates/zip/9.0.5/download"
+    },
+    {
+      "name": "zlib-rs",
+      "version": "0.6.8",
+      "license_expression": "Zlib",
+      "selected_licenses": [
+        "Zlib"
+      ],
+      "authors": [],
+      "repository": "https://github.com/trifectatechfoundation/zlib-rs",
+      "source": "https://crates.io/api/v1/crates/zlib-rs/0.6.8/download"
     },
     {
       "name": "zmij",
