@@ -90,7 +90,7 @@ def main() -> int:
     lock_hash = hashlib.sha256(Path("runtime/Cargo.lock").read_bytes()).hexdigest()
     if inventory["cargo_lock_sha256"] != lock_hash:
         raise SystemExit("dependency notices are stale; run scripts/generate_licenses.py")
-    for filename in ("dependencies.json", "THIRD_PARTY_LICENSES.txt"):
+    for filename in ("dependencies.json", "THIRD_PARTY_LICENSES.txt", "LICENSE-BIP39.txt"):
         shutil.copy2(Path("licenses") / filename, notices / filename)
     for filename in ("LICENSE-A2A", "protocol-manifest.toml"):
         shutil.copy2(upstream / filename, notices / filename)

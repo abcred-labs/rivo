@@ -99,7 +99,7 @@ def main() -> int:
             names = set(handle.namelist())
             assert handle.read(f"rivo-{version}-windows-amd64/THIRD_PARTY_NOTICES.md") == (ROOT / "THIRD_PARTY_NOTICES.md").read_bytes()
             assert handle.read(f"rivo-{version}-windows-amd64/share/rivo/licenses/LICENSE-A2A") == (ROOT / "runtime/crates/a2a/protocol/v1.0.1/LICENSE-A2A").read_bytes()
-            for filename in ("dependencies.json", "THIRD_PARTY_LICENSES.txt"):
+            for filename in ("dependencies.json", "THIRD_PARTY_LICENSES.txt", "LICENSE-BIP39.txt"):
                 assert handle.read(f"rivo-{version}-windows-amd64/share/rivo/licenses/{filename}") == (ROOT / "licenses" / filename).read_bytes()
             assert handle.read(f"rivo-{version}-windows-amd64/README.md") == (ROOT / "packaging/archive/README.md").read_bytes()
             assert handle.read(f"rivo-{version}-windows-amd64/share/rivo/examples/mock_provider.py") == (ROOT / "packaging/archive/mock_provider.py").read_bytes()
@@ -149,6 +149,7 @@ def main() -> int:
             assert f"{prefix}/share/rivo/licenses/protocol-manifest.toml" in names
             assert f"{prefix}/share/rivo/licenses/dependencies.json" in names
             assert f"{prefix}/share/rivo/licenses/THIRD_PARTY_LICENSES.txt" in names
+            assert f"{prefix}/share/rivo/licenses/LICENSE-BIP39.txt" in names
             assert f"{prefix}/share/rivo/examples/mock_provider.py" in names
             assert not any("browser-extension" in name for name in names)
             assert f"{prefix}/share/rivo/brand/rivo-mark.svg" in names

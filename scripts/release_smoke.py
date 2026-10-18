@@ -101,7 +101,7 @@ def main() -> int:
             run("language", "validate", str(language))
         checks.append("packaged en-US/zh-CN FTL validation")
         notices = package / "share/rivo/licenses"
-        for name in ("dependencies.json", "THIRD_PARTY_LICENSES.txt"):
+        for name in ("dependencies.json", "THIRD_PARTY_LICENSES.txt", "LICENSE-BIP39.txt"):
             assert (notices / name).read_bytes() == (ROOT / "licenses" / name).read_bytes()
         checks.append("complete dependency licenses preserved")
 
