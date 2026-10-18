@@ -1,7 +1,7 @@
 # Provider 管理
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`in_progress`；接口和确认语义以 [CLI 契约](../../architecture/cli.md) 与 FEAT-029 为准。
+- 接口边界：接口和确认语义以 [CLI 契约](../../architecture/cli.md)为准。
 
 Provider 是一个独立连接，拥有 `base_url`、认证引用、enabled、priority 和 discovery。它不携带协议，也不携带默认 Model；相同 URL 的两个 Provider 仍然是不同对象。
 

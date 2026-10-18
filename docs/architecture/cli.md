@@ -45,9 +45,9 @@ CLI 帮助按命令层级组织：`rivo <command> --help` 只列出该层直接�
 
 上述命令的 stdout 不包含语言文件正文；错误不得回显恶意 metadata、URL userinfo、query 或 fragment。启动、resume、TUI reload 和后台任务不得隐式访问语言 registry。
 
-## 纯模型路由入口（FEAT-029 目标契约）
+## 模型路由入口（schema 6）
 
-2026-09-09 冻结纯 schema 3，状态 `in_progress`；本节是配套实现的目标，不把旧二进制视为已支持。字段与受控重置见 [Provider 地址契约](provider-endpoint-ownership.md)。
+当前配置使用 schema 6；Model 决定协议，Provider 保存地址与认证引用。字段与受控重置见 [Provider 地址契约](provider-endpoint-ownership.md)。
 
 - 模型目录/连接入口为 `config vendor|model|provider list|show|set|remove`；`config model list [--vendor <vendor-id>] [--state <enabled|disabled|all>]` 输出 enabled 状态，目标 Vendor 不存在时拒绝，省略或传入 `all` 输出全部；重复、缺失或非法 `--state` 返回退出码 `2`。`config model enable|disable <model-id>...` 按 ID 批量更新状态。批量输入去重，未知 ID 单独报告而其他有效项照常在一次原子提交中保存，命令仍以 `0` 退出。默认选择由 `config set/unset vendor|model|provider_id` 管理。Provider 新建要求 `--base-url`，认证采用已有 `--credential-name` 引用，另可设 `--enabled/--priority`；Provider 不携带协议，传入 `--protocol` 失败并提示改用 `config model set`。协议由 Model `supported_protocols` 有序列表的第一项决定，`config model set <model-id>` 以 `--enable-protocol`（追加）、`--disable-protocol`（移除，不能移除最后一个）或 `--protocols`（整体替换，顺序即偏好）调整，内置模型写为本地覆盖；更新省略的字段保留原值，不按 URL 复用对象。连接变更仍要求影响确认，并使旧 discovery 失效。
 - `config provider set` 默认只保存本地配置并提示显式 refresh；仅传入 Provider 专用 `--refresh` 时才在提交后执行认证 discovery。refresh 失败不回滚已保存配置。
@@ -89,7 +89,7 @@ Provider 新建必须提供地址。地址/协议/认证引用变更在未带确
 
 ## TUI 首启
 
-schema 5 首启仅在缺文件或有效配置无 Provider 时提供新建向导；支持的旧文件先自动迁移，旧本地 Model 缺少 `supported_protocols` 时迁移失败且不能当空配置覆盖。先创建 Provider（Base URL、认证引用），再由用户显式执行 discovery，最后选择 Vendor → canonical Model → Auto/Provider；未刷新不能运行。Provider 可以先本地校验后保存以便修复连接，不把 discovery 成功设为所有配置维护的前置。完整首启草稿取消不保存；已单独确认的 Provider/凭据操作不因随后取消模型选择而暗中回滚。
+schema 6 首启仅在缺文件或有效配置无 Provider 时提供新建向导；支持的旧文件先自动迁移，旧本地 Model 缺少 `supported_protocols` 时迁移失败且不能当空配置覆盖。先创建 Provider（Base URL、认证引用），再由用户显式执行 discovery，最后选择 Vendor → canonical Model → Auto/Provider；未刷新不能运行。Provider 可以先本地校验后保存以便修复连接，不把 discovery 成功设为所有配置维护的前置。完整首启草稿取消不保存；已单独确认的 Provider/凭据操作不因随后取消模型选择而暗中回滚。
 
 Credential 正文只由既有专用凭据交互处理，绝不进入配置草稿或回显。`env` 读取引用，`local` 沿用本机独立凭据存储；其认证加密仅避免明文落盘，不等同于 OS keychain 或用户口令保护，CI/团队优先使用 `env`。删除或取消 Provider 草稿不得删除已有 Credential。
 

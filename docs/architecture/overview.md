@@ -1,10 +1,10 @@
 # Rivo 架构
 
-Rivo V1 使用分层 Rust 运行时并保持清晰模块边界。FEAT-001–015 的固定接口和默认限制见 Dev Ready 统一契约，代码状态见 设计与实现状态。
+Rivo 使用分层 Rust 运行时。公共行为见 [CLI 契约](cli.md)、[安全策略](safety-policy.md)与[功能矩阵](../guides/feature-matrix.md)；发布验证见[发布流程](../runbooks/releasing.md)。
 
 ## 定位对架构的影响
 
-Rivo V1 定位为通用 Agent，通过 general、research、plan、coding、review 五种基础模式和按 turn 启用的 Web、MCP、记忆能力组合行为。research 强制证据追溯，plan 形成可执行方案，coding 提供受控工作区操作，review 保持只读审查。模式提示词与工具可见性详见 Agent 提示词架构。
+Rivo V1 定位为通用 Agent，通过 general、research、plan、coding、review 五种基础模式和按 turn 启用的 Web、MCP、记忆能力组合行为。research 强制证据追溯，plan 形成可执行方案，coding 提供受控工作区操作，review 保持只读审查。模式提示词与工具可见性见 [Agent 能力边界](agent-capability-baseline.md)。
 
 这一定位带来以下架构约束：
 
@@ -12,7 +12,7 @@ Rivo V1 定位为通用 Agent，通过 general、research、plan、coding、revi
 - 智能体循环层应围绕证据、工具观察结果、停止条件和最终报告组织上下文。
 - Agent 循环将稳定核心提示词、模式覆盖和 turn 能力摘要置于历史消息前；提示词不替代工具注册、policy 或确认。
 - LLM 提供方层应支持多种协议适配，但向运行时暴露稳定统一的决策结果。
-- 工具运行时层按基础模式和每 turn 附加能力暴露只读、编码、Web 与 MCP 工具；浏览器自动化属于 post-V1。
+- 工具运行时层按基础模式和每 turn 附加能力暴露只读、编码、Web 与 MCP 工具；Windows 浏览器扩展提供受 policy 保护的浏览器工具。
 - 策略层应默认保护工作区、网络、Shell、写入、浏览器交互、MCP server 和凭据边界。
 - 遥测层应让模型决策、工具调用和策略结果可审阅，便于技术、业务和合规用户复核。
 
@@ -69,7 +69,7 @@ CLI / TUI / 中立本机 host
    -> LLM 提供方层 / 策略层 / 工具运行时层 / Storage / 遥测层
 ```
 
-TUI 的跨平台 smoke 属于 V1 发布验收。Desktop 由独立仓库维护，不构成本仓库的交互面规划或验收；分离边界见 Desktop 仓库分离计划。
+TUI 的跨平台 smoke 属于 V1 发布验收。Desktop 由独立仓库维护，不构成本仓库的交互面规划或验收；本仓库只维护中立 app-server 接口。
 
 V1 完成门包含 A2A Client 与受控局域网 A2A Server（仅 Windows 运行时）；Client 以受 policy 保护的委派工具调用受信任对端，Server 将已认证的远端任务投影为独立本机 Session。该能力不复用 `app-server` 的本机 stdio 协议，完整边界见 [A2A 双角色互操作](./a2a-interoperability.md)。Linux/macOS 原生运行时适配属于 V2，但 A2A 协议跨平台互操作可按[跨平台研究集群组建手册](../runbooks/a2a-cross-platform-cluster.md)单独验收。
 
@@ -95,7 +95,7 @@ runtime/
     xtask/
 ```
 
-所有列出的 crate 均已存在并有实现；`prompts-management` 负责提示词资产与持久指令边界，`test-support` 提供隔离测试环境。交付状态以 release-state.json 为准，功能路线以 directory-layout.md 与 steps 为准。
+所有列出的 crate 均已存在并有实现；`prompts-management` 负责提示词资产与持久指令边界，`test-support` 提供隔离测试环境。交付版本以 GitHub Releases 为准，验证记录必须对应发布提交与平台。
 
 ## V1 运行时流程
 

@@ -16,11 +16,11 @@ Rivo 面向本地 Workspace 中用户可见的工作。每个工具请求在执�
 
 ## 安装发行版
 
-预编译归档发布在 [GitHub Releases](https://github.com/abcred-labs/rivo/releases)。运行前请根据发行版提供的校验和验证归档。
+可用归档见 [GitHub Releases](https://github.com/abcred-labs/rivo/releases)；尚无公开版本时请从源码构建。运行前根据发行版提供的校验和验证归档。
 
 ## 从源码构建
 
-前置条件：Git、rustup、Python 3；Windows 构建还需要带 C++ 和 Windows SDK 的 Visual Studio Build Tools。
+前置条件：Git、rustup、Python 3.11+；浏览器扩展测试需要 Node.js 22；Windows 构建还需要带 C++ 和 Windows SDK 的 Visual Studio Build Tools。
 
 ```powershell
 Set-Location runtime
@@ -29,7 +29,7 @@ cargo run -p rivo -- --version
 cargo run -p rivo -- --help
 ```
 
-运行确定性质量门禁：
+先运行 `rustup toolchain install 1.88.0 --profile minimal` 安装最低支持版本检查使用的工具链，再运行确定性质量门禁：
 
 ```powershell
 cargo run -p xtask -- check

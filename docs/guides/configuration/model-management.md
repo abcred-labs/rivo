@@ -1,7 +1,7 @@
 # Model 管理
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`in_progress`；canonical Model 与自动路由的规则以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准。
+- 接口边界：canonical Model 与自动路由的规则以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准。
 
 Model 是模型目录身份，不保存 Provider 地址、认证或人工映射。canonical Model ID 区分大小写，且前后缀必须与 Provider discovery 返回的完整 ID 精确一致。
 

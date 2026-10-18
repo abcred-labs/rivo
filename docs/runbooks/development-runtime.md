@@ -1,6 +1,6 @@
 # 开发模式运行手册
 
-本手册面向从本仓库源码运行 Rivo 的开发者和试用者。模型示例按 2026-09-15 的 schema 5 CLI 接口编写；FEAT-029 仍为 `in_progress`，未运行的候选验收不因文档更新而通过，不应视为生产就绪产品。
+本手册面向从本仓库源码运行 Rivo 的开发者和试用者。模型示例使用当前 schema 6 CLI；版本和平台验收见[发布流程](releasing.md)。
 
 已打开 TUI Session 可按 F6 或执行 `/settings`。面板默认是 Browse 表单：方向键或
 Tab 移动字段，Enter 进入单项编辑，枚举用方向键预览，文本/数字直接输入，多选用
@@ -34,9 +34,9 @@ cargo run -p rivo -- config path
 
 ## 2. 配置、Credential 与优先级
 
-模型选择使用 CLI `--vendor/--model/--provider-id` 或配置默认，`--auto-provider` 可覆盖默认显式 Provider；不依赖模型连接或模型选择环境变量。协议只由所选 Model 的 `supported_protocols` 第一项决定；`base_url` 与认证只从所选 Provider 解析。业务 `--profile/RIVO_PROFILE`、policy 和 workspace 等非模型配置保留原优先级。主配置可用 `RIVO_CONFIG` 指向其他位置；Credential 文件始终与主配置文件同目录。自动化测试可用 `RIVO_CONFIG_CONTENT` 注入整份主配置 TOML 原文，免写临时文件：注入后不读写磁盘配置文件，内容必须显式 `version = 6`，所有配置写入入口返回只读错误并零写入。
+模型选择使用 CLI `--vendor/--model/--provider-id` 或配置默认，`--auto-provider` 可覆盖默认显式 Provider；选择优先级为 CLI > `RIVO_VENDOR/RIVO_MODEL/RIVO_PROVIDER_ID` > 配置默认；旧连接覆盖环境变量仍拒绝。协议只由所选 Model 的 `supported_protocols` 第一项决定；`base_url` 与认证只从所选 Provider 解析。业务 `--profile/RIVO_PROFILE`、policy 和 workspace 等非模型配置保留原优先级。主配置可用 `RIVO_CONFIG` 指向其他位置；Credential 文件始终与主配置文件同目录。自动化测试可用 `RIVO_CONFIG_CONTENT` 注入整份主配置 TOML 原文，免写临时文件：注入后不读写磁盘配置文件，内容必须显式 `version = 6`，所有配置写入入口返回只读错误并零写入。
 
-主配置必须显式 `version = 6`。每个本地 Model 还必须显式声明非空、有序的 `supported_protocols`（路由使用第一项）；旧 schema 4 本地 Model 缺少该字段时无法安全推断，升级必须零写入拒绝。已支持的历史 `config.toml`、`credentials.toml` 与 `instances.json` 格式必须按[持久化文件兼容与自动升级契约](../architecture/persistence-file-compatibility.md)迁移为当前格式；损坏、无法保留语义或未来版本明确失败且零写入。旧会话 schema 不在该范围内，仍在列明实际路径、表和影响后按[受控重置边界](../architecture/provider-endpoint-ownership.md)处理，保留 Credential、记忆、MCP、A2A 信任及其他非会话数据，不删除整个目录或数据库。FEAT-029 当前为 `in_progress`，现有二进制在迁移器交付前可能继续拒绝历史配置。
+主配置必须显式 `version = 6`。每个本地 Model 还必须显式声明非空、有序的 `supported_protocols`（路由使用第一项）；旧 schema 4 本地 Model 缺少该字段时无法安全推断，升级必须零写入拒绝。已支持的历史 `config.toml`、`credentials.toml` 与 `instances.json` 格式必须按[持久化文件兼容与自动升级契约](../architecture/persistence-file-compatibility.md)迁移为当前格式；损坏、无法保留语义或未来版本明确失败且零写入。旧会话 schema 不在该范围内，仍在列明实际路径、表和影响后按[受控重置边界](../architecture/provider-endpoint-ownership.md)处理，保留 Credential、记忆、MCP、A2A 信任及其他非会话数据，不删除整个目录或数据库。仅支持兼容契约列出的历史格式，不能安全迁移的输入明确拒绝。
 
 以下命令是路径的权威来源：
 
@@ -298,11 +298,6 @@ cargo install cargo-llvm-cov --locked
 cargo xtask coverage
 ```
 
-本地预览验收前从仓库根目录的 `live-test.example.toml` 复制本地配置，为三个 target（Chat Completions 一个、Responses 两个、Messages 两个）设置模型、Base URL 和 Credential 引用或 `api_key_env`，再执行：
+真实 Provider 验证按已配置的模型分别运行最小任务，并记录版本、协议及结果；不要将凭据、完整响应或用户数据提交到报告。
 
-```powershell
-cargo xtask release-test --live-config ../live-test.toml --report-dir ../artifacts/test-reports
-```
-
-
-历史报告只证明原候选，不用于 schema 5 新候选，也不得改写报告的提交或结果。完整流程见 [源码配置与测试指南](../../SOURCE_CONFIGURATION_AND_TESTING.md)；本轮文档清理不等于已运行 Rust、ConPTY、三协议三个 target 或 A2A 验收。
+完整流程见[源码配置与测试指南](../../SOURCE_CONFIGURATION_AND_TESTING.md)；本地测试、发布归档 smoke、真实 Provider 和 A2A 互操作须分别记录证据。

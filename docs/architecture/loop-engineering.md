@@ -1,6 +1,6 @@
 # Agent 循环工程契约
 
-V1 使用顺序 ReAct 循环。固定默认值和跨层规则见 Dev Ready 统一契约。
+V1 使用顺序 ReAct 循环。跨层规则见[工具运行时](tool-runtime.md)与[交互面](interaction-surface.md)。
 
 ## 职责
 

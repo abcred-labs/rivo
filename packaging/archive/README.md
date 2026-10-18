@@ -1,6 +1,6 @@
 # Rivo archive guide
 
-Release archives are published on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases). Windows x64 uses ZIP; Linux x64 and macOS x64 use tar.gz. Apple Silicon macOS can run the x64 archive through Rosetta.
+Release archives are published on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases). Windows amd64 uses ZIP; Linux amd64/arm64 and macOS amd64/arm64 use tar.gz. Apple Silicon users should use the native arm64 archive.
 
 ## Verify and extract
 
@@ -20,7 +20,9 @@ cd rivo-<version>-linux-amd64
 export PATH="$PWD:$PATH"
 ~~~
 
-The archive includes LICENSE, bundled language files and, on Windows, the browser extension host and extension resources. Linux and macOS archives provide the CLI; Windows provides the Windows Terminal, Computer Use and browser-extension integrations.
+On macOS, use `shasum -a 256 -c` instead of `sha256sum -c`.
+
+Keep the extracted directory together: it contains LICENSE, complete dependency licenses in `share/rivo/licenses/`, language files and, on Windows, the browser extension host and extension resources. Linux and macOS archives provide the CLI/TUI; Windows additionally provides Windows Terminal, Computer Use and browser-extension integrations. Archives are unsigned; checksums verify file integrity and do not provide publisher authentication.
 
 ## Local mock provider
 

@@ -1,7 +1,7 @@
 # 模型路由
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`in_progress`；路由规则以 FEAT-029 为准。
+- 接口边界：路由规则见[地址归属契约](../../architecture/provider-endpoint-ownership.md)。
 
 路由选择一个 Vendor、一个 canonical Model 和一个 Provider。运行请求使用被选 Model 的首选协议，以及被选 Provider 的地址和认证引用，不能用运行时 URL 或认证参数覆盖。
 

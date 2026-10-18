@@ -4,9 +4,10 @@
 
 ## 开发环境
 
-- Rust 工具链以 `rust-toolchain.toml` 为准。
+- Rust 工具链以 `rust-toolchain.toml` 为准；最低版本检查另需 `rustup toolchain install 1.88.0 --profile minimal`。Python 需要 3.11+，浏览器扩展测试使用 Node.js 22。
 - 运行 `cargo fmt --all -- --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo build --workspace --all-targets --locked` 和 `cargo test --workspace --all-targets --locked`。
 - 运行 `python scripts/check_markdown_links.py` 检查文档链接。
+- 扩展测试、依赖漏洞与许可证检查见[发布质量门](docs/runbooks/releasing.md)。
 
 ## Pull Request 要求
 

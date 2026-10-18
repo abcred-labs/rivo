@@ -1,7 +1,7 @@
 # Provider 地址归属与模型协议契约（schema 6）
 
-- 决策日期：2026-09-10；2026-10-15 修订为 schema 6（协议只由 Model 决定，Provider 不再携带协议）；状态：`in_progress`。
-- 归属：FEAT-029，V1 Windows 11 x64；本文冻结目标契约，不表示实现或候选验收已完成。
+- 当前格式：schema 6，协议只由 Model 决定，Provider 不再携带协议。
+- 本文规定共享模型路由与地址边界；平台验收见[发布流程](../runbooks/releasing.md)。
 - 模型领域仅保留 Vendor、Model、Provider 与独立 Credential。本文不改变模式/policy profile、审批绑定、快捷键或 MCP/A2A/instance-control 的非模型 endpoint；中心监督已退出本仓库交付。
 
 ## 1. 地址与对象生命周期
@@ -16,7 +16,7 @@ Provider 自有 `base_url`、`auth`、`enabled`、`priority` 与 `discovery`，�
 
 ## 2. 模型配置 schema 6
 
-`version = 6` 是模型配置格式版本，不是产品 V3。非模型配置字段与安全语义不变。schema 5 引入逐模型 `supported_protocols`；schema 6 将其改为有序列表并移除 Provider `protocol`。协议不能从 Vendor、模型前缀、Provider 或 discovery 结果推断。目标模型字段如下：
+`version = 6` 是模型配置格式版本，不是产品 V3。非模型配置字段与安全语义不变。schema 5 引入逐模型 `supported_protocols`；schema 6 将其改为有序列表并移除 Provider `protocol`。协议不能从 Vendor、模型前缀、Provider 或 discovery 结果推断。模型字段如下：
 
 | 位置 | 字段与约束 |
 | --- | --- |

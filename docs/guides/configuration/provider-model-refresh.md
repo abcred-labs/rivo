@@ -1,7 +1,7 @@
 # 刷新 Provider 模型目录
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`in_progress`；刷新和可用性要求以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准。
+- 接口边界：刷新和可用性要求以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准。
 
 刷新是唯一会请求 Provider 模型目录的配置命令。它执行认证 discovery，更新该 Provider 的 `discovery`；不会创建 Vendor/Model，也不会修改默认模型选择。
 

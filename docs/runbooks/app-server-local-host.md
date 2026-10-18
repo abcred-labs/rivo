@@ -18,7 +18,7 @@ rivo config show
 rivo config route --vendor <vendor> --model <canonical-model-id> --provider-id <provider-id>
 ```
 
-这些查询离线只读，结构 validate 不证明路由可用。已支持的旧 `config.toml`、`credentials.toml` 与 `instances.json` 格式按[持久化文件兼容与自动升级契约](../architecture/persistence-file-compatibility.md)自动升级；迁移后未知字段、损坏或未来版本明确拒绝且零写入。旧会话 schema 仍拒绝，不保留旧模型运行时或自动清空步骤。受控重置须按 [地址契约](../architecture/provider-endpoint-ownership.md) 保留 Credential、记忆、MCP、A2A 信任与非会话数据。FEAT-029 保持 `in_progress`；历史宿主报告只证明原候选，不可用于本次新候选。
+这些查询离线只读，结构 validate 不证明路由可用。已支持的旧 `config.toml`、`credentials.toml` 与 `instances.json` 格式按[持久化文件兼容与自动升级契约](../architecture/persistence-file-compatibility.md)自动升级；迁移后未知字段、损坏或未来版本明确拒绝且零写入。旧会话 schema 仍拒绝，不保留旧模型运行时或自动清空步骤。受控重置须按 [地址契约](../architecture/provider-endpoint-ownership.md) 保留 Credential、记忆、MCP、A2A 信任与非会话数据。宿主集成必须匹配实际发布的协议和配置版本。
 
 ## 2. 启动与握手
 

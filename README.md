@@ -16,14 +16,14 @@ The repository does not provide a hosted gateway, multi-tenant execution service
 
 ## Install a release
 
-Prebuilt archives are published on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases). Verify the release checksums before running an archive.
+Available archives are listed on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases). If no version has been published yet, build from source. Verify the release checksums before running an archive.
 
 ## Build from source
 
 Prerequisites:
 
 - Git and [rustup](https://rustup.rs/); the repository toolchain is pinned in [rust-toolchain.toml](rust-toolchain.toml).
-- Python 3 for repository checks.
+- Python 3.11+ for repository checks; Node.js 22 for browser-extension tests.
 - Windows builds require Visual Studio Build Tools with C++ and a Windows SDK.
 
 ```powershell
@@ -33,7 +33,7 @@ cargo run -p rivo -- --version
 cargo run -p rivo -- --help
 ```
 
-Run the deterministic quality gate:
+Install the additional Rust 1.88.0 toolchain with `rustup toolchain install 1.88.0 --profile minimal` to run the MSRV check, then run the deterministic quality gate:
 
 ```powershell
 cargo run -p xtask -- check

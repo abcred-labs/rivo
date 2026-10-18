@@ -26,6 +26,7 @@ python scripts/check_markdown_links.py
 The xtask quality gate combines the repository checks:
 
 ~~~powershell
+rustup toolchain install 1.88.0 --profile minimal
 cargo run -p xtask -- check
 ~~~
 

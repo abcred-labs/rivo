@@ -198,7 +198,7 @@ Intent::Confirm / RespondInteraction / CancelTurn
 | Provider | 通过哪个协议、哪个 `base_url` 连接服务，优先级是多少？ |
 | Credential | 这个连接引用哪项独立保存的认证凭据？ |
 
-当前 schema 5 的路由主线是：
+当前 schema 6 的路由主线是：
 
 **选择 Vendor / Model → 从已认证 discovery 的 Provider 目录中精确匹配 → Auto 排序选择或显式指定 → 构造 LLM 客户端。**
 
@@ -206,7 +206,7 @@ Intent::Confirm / RespondInteraction / CancelTurn
 - discovery 需要显式刷新；本地查询、校验和路由预览不证明远端现在可用。
 - Model ID 必须完整精确匹配，不依赖别名或手工改写请求 ID。
 - Model 还必须显式声明按偏好排序的支持协议列表，请求协议取第一项，与 Provider 无关；Model 须出现在 Provider authenticated discovery exact IDs 中才可路由。discovery 返回结果不能反向扩展模型协议能力，内置模型的协议可由本地配置覆盖。
-- schema 5 是配置版本，不是产品 V3。旧配置、旧会话不应直接套用新格式，旧本地 Model 缺少协议集合时不能靠猜测或删除整个应用数据目录来“修复”。
+- schema 6 是配置版本，不是产品 V3。旧配置、旧会话不应直接套用新格式，旧本地 Model 缺少协议集合时不能靠猜测或删除整个应用数据目录来“修复”。
 
 源码定位：[模型路由](../../runtime/crates/session/src/model_routing.rs)、[LLM 契约与客户端工厂](../../runtime/crates/llm/src/lib.rs)、[协议实现](../../runtime/crates/llm/src/provider.rs)。操作步骤以[配置与模型管理](configuration/README.md)为准；模型路由 Feature 仍为 `in_progress`，不要把目标契约、当前工作树和历史下载构件当成完全一致的接口。
 
@@ -268,14 +268,14 @@ rivo run --profile coding --workspace . --prompt "请修复已说明的问题，
 
 | 范围 | 新用户应如何理解 |
 | --- | --- |
-| 核心循环、CLI/TUI、文件/进程工具、三协议、历史和记忆 | 当前代码已有实现；是否可作为当前候选验收通过，仍须看预览事实源。 |
-| Web / Browser / MCP、内部子代理、A2A 与 instance-control | 当前代码已有相应入口与受控实现，但各能力有独立配置和信任要求；不是默认全开，也不代表外部互操作门禁已关闭。 |
-| FEAT-029 模型路由 | `in_progress`；schema 5 与逐模型协议矩阵影响 CLI/TUI/Session/app-server 和恢复路径，旧证据不代表新候选通过。 |
-| FEAT-030 查询默认格式 | `in_progress`；部分查询支持格式设置，不应推断它改变 `run` 的输出契约。 |
-| FEAT-031 i18n | `in_progress`；已有语言文件基础相关工作树实现，不应据此宣布全产品语言切换完成。 |
-| FEAT-024 中心监督 | 本仓库不再交付，服务与运行时接线已移除；仅保留未来设计参考，不承诺 V2 实现，也不提供当前接口。 |
-| Linux/macOS 与正式分发 | 构建产物存在，不等于改变 V1 Windows 产品预览范围，也不等于正式发布完成。 |
-| 插件、Marketplace、Desktop/Office 自动化、向量记忆、多工具并行等扩展 | 不属于本导读承诺的 V1 能力；P3 在本仓库只保留规划文档，Desktop 实现由独立仓库负责。 |
+| 核心循环、CLI/TUI、文件/进程工具、三协议、历史和记忆 | 已有源码实现；指定版本和平台的可用性须以对应 CI 与归档运行验收确认。 |
+| Web / Browser / MCP、内部子代理、A2A 与 instance-control | 有受控入口，各自需要配置和信任；Windows 专属工具不在其他系统开放。跨节点互操作须单独验证。 |
+| 模型路由 | 配置 schema 6，Model 有序协议列表决定协议，Provider 保存地址和认证引用；支持格式的历史配置可迁移。 |
+| 查询默认格式 | 支持查询格式设置，不改变 `run` 的输出契约。 |
+| i18n | 包含 en-US/zh-CN 及语言文件管理；仍有未完全翻译的文案，机器协议不本地化。 |
+| 中心监督、托管网关、Web/Mobile 客户端 | 本仓库不交付。Desktop UI 由独立仓库负责。 |
+| Linux/macOS 与分发 | 有 amd64/arm64 发布目标；每种构件须经原生 runner smoke。旧系统兼容性和真实交互终端需另外验证。 |
+| 插件商城、向量记忆、多工具并行等扩展 | 不是当前公开版本的交付承诺。 |
 
 不建议用于无人值守生产部署、支付下单、不可逆远端删除或替代法律/财务/合规最终判断。Rivo 是辅助执行和核验的工具，不是“给一个目标就无限自主运行”的系统。
 
@@ -301,7 +301,7 @@ rivo run --profile coding --workspace . --prompt "请修复已说明的问题，
 | 异步会话怎样保存到 SQLite？ | [Session persistence](../../runtime/crates/session/src/persistence.rs) 与 [Store](../../runtime/crates/storage/src/lib.rs)。 |
 | UI 是否能绕过内核直接执行？ | [TUI 源码](../../runtime/crates/tui/src/lib.rs)与 [TUI 依赖](../../runtime/crates/tui/Cargo.toml)。 |
 
-更深的设计见[运行时架构](../architecture/overview.md)、[Session 与交互面](../architecture/interaction-surface.md)、[Agent 循环](../architecture/loop-engineering.md)、[安全策略](../architecture/safety-policy.md)。各文档可能记录不同历史阶段；遇到差异时，产品范围查路线图、当前行为查源码、通过状态查同候选证据，不把三者混为一谈。
+更深的设计见[运行时架构](../architecture/overview.md)、[Session 与交互面](../architecture/interaction-surface.md)、[Agent 循环](../architecture/loop-engineering.md)、[安全策略](../architecture/safety-policy.md)。各文档可能记录不同历史阶段；遇到差异时，以当前源码与命令帮助核对行为，以相同提交的平台 CI 与 Release 说明核对验证范围。
 
 ### 我想接入其他系统
 

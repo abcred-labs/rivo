@@ -1,7 +1,7 @@
 # Credential 管理
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`completed`；模型配置集成状态仍以 FEAT-029 为准。
+- 接口边界：模型路由见[地址归属契约](../../architecture/provider-endpoint-ownership.md)。
 
 Credential 是独立的本地认证存储。它不会显示 API Key 正文，也不应将密钥写入命令行、脚本、`config.toml`、日志或仓库。
 

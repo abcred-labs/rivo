@@ -1,6 +1,6 @@
 # 交互面与 Session 契约
 
-本文档固定 CLI、TUI 与中立 app-server host 的前端边界。公共默认值见 Dev Ready 统一契约。
+本文档固定 CLI、TUI 与中立 app-server host 的前端边界。公共入口见 [CLI 契约](cli.md)与 [app-server 协议](app-server-protocol.md)。
 
 ## 分层边界
 
@@ -34,7 +34,7 @@ V1 Intent 覆盖：
 - `CancelTurn`：取消当前 provider、tool 或 confirmation wait。序列化名称为 `cancel_turn`；`cancel` 明确拒绝。
 - `RetryStep`：重试最近一个可重试失败 Feature。
 - `SetTurnOptions`：切换基础模式、policy、Web、MCP、记忆和追踪；MCP 只能选择本机配置的 server/toolset，不能放宽已等待确认的请求。
-- `SelectModel { selection }`：选择 `vendor/model/provider`，其中 Provider 为 `{"mode":"auto"}` 或 `{"mode":"explicit","provider_id":"<id>"}`，唯一 resolver 校验成功后才改变后续 turn 选择；活动 turn 与 retry 保持快照。字段与持久化边界见 Dev Ready 模型选择契约。
+- `SelectModel { selection }`：选择 `vendor/model/provider`，其中 Provider 为 `{"mode":"auto"}` 或 `{"mode":"explicit","provider_id":"<id>"}`，唯一 resolver 校验成功后才改变后续 turn 选择；活动 turn 与 retry 保持快照。字段与持久化边界见[模型路由契约](provider-endpoint-ownership.md)。
 - `ConfirmMemory`、`RejectMemory`、`DeleteMemory`：管理持久记忆。
 
 V1 不提供 pause、skip 或批量确认。`Confirm.scope=session` 只复用相同风险类别和边界的中等模式授权，不是“本 session 全部允许”。Intent 必须可序列化，供未来 IPC 复用。

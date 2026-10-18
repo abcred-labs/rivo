@@ -255,7 +255,7 @@ Client 的 peer trust snapshot、任务映射和撤销状态由 SQLite 持久化
 
 公网生产部署、多租户控制面、跨组织委派、push callback、二进制 Artifact、开放注册中心和无人值守高风险操作均不属于 `FEAT-021-a2a-client` / `FEAT-022-a2a-server`。
 
-## 11. Dev Ready 补强冻结项
+## 11. 互操作约束
 
 本节的规则优先于本文中较早的概述性表述，并作为两个 A2A Feature 的实现前置条件。
 

@@ -26,6 +26,7 @@ python scripts/check_markdown_links.py
 也可以运行统一质量门禁：
 
 ~~~powershell
+rustup toolchain install 1.88.0 --profile minimal
 cargo run -p xtask -- check
 ~~~
 

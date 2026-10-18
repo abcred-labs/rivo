@@ -52,7 +52,7 @@ For confirmation interactions, `decision` must be `allow` or `deny`; allow is al
 
 ## 本机跨会话消息（FEAT-037 P1）
 
-同一 app-server 进程托管的 Session 之间可以互发消息，契约见 FEAT-037。`runtime_settings.session_messaging=true`（会话或 turn 级，默认 `false`，`accepted_runtime_settings` 回显）时，该 Turn 的根 Agent 才暴露 `session_list_peers` 与 `session_send`；子代理不继承。`session_send` 走 `Operation::SessionMessaging`：`read_only` 拒绝，`workspace_write` 每次以 `interaction_request` 确认，`full_access` 允许。
+同一 app-server 进程托管的 Session 之间可以按本节契约互发消息。`runtime_settings.session_messaging=true`（会话或 turn 级，默认 `false`，`accepted_runtime_settings` 回显）时，该 Turn 的根 Agent 才暴露 `session_list_peers` 与 `session_send`；子代理不继承。`session_send` 走 `Operation::SessionMessaging`：`read_only` 拒绝，`workspace_write` 每次以 `interaction_request` 确认，`full_access` 允许。
 
 ```json
 {"method":"session/peers","params":{}}
@@ -79,15 +79,15 @@ Memory management is a local, explicit host capability. It is scoped through an 
 
 `memory/list` returns bounded, redacted memory/candidate metadata and bodies for the explicitly requested local management view. Candidate confirmation remains hash-bound; reject and delete are scoped to the Session workspace and update the runtime's existing SQLite/FTS tables. Cross-workspace targets return `ownership_mismatch`, stale or missing targets return `memory_not_found`, and storage failures return `storage_unavailable`. State-changing methods use the same bounded idempotency cache as other local mutations; these methods never accept credential, URL, or arbitrary database parameters.
 
-FEAT-029 的 `runtime_settings.vendor/model/provider_id/auto_provider` 仅选择本机有效目录中的 Vendor、canonical Model 和 Provider，不持久化全局配置。局部设置省略字段沿用宿主会话默认；`provider_id: null` 与省略等价，不能清除既有选择。切回 Auto 必须用 `auto_provider: true`，且不能同时给非空 `provider_id`；显式 ID 则选择该 Provider。宿主转换为 Session 的 `ModelSelection { vendor, model, provider }`，其中 provider wire 为 `{"mode":"auto"}` 或 `{"mode":"explicit","provider_id":"<id>"}`。本次仍为 `in_progress`，源码支持不等于候选已验收。Session 在接受 turn 前用唯一 resolver 校验完整选择，不可用返回 `unsupported_setting`，不得回退旧模型或其他 Provider。`collaboration_mode` 仍映射 plan/code 到 plan/coding，`permission_preset` 仍映射 strict/medium/full_control。
+`runtime_settings.vendor/model/provider_id/auto_provider` 仅选择本机有效目录中的 Vendor、canonical Model 和 Provider，不持久化全局配置。局部设置省略字段沿用宿主会话默认；`provider_id: null` 与省略等价，不能清除既有选择。切回 Auto 必须用 `auto_provider: true`，且不能同时给非空 `provider_id`；显式 ID 则选择该 Provider。宿主转换为 Session 的 `ModelSelection { vendor, model, provider }`，其中 provider wire 为 `{"mode":"auto"}` 或 `{"mode":"explicit","provider_id":"<id>"}`。集成时须验证对应发布版本。Session 在接受 turn 前用唯一 resolver 校验完整选择，不可用返回 `unsupported_setting`，不得回退旧模型或其他 Provider。`collaboration_mode` 仍映射 plan/code 到 plan/coding，`permission_preset` 仍映射 strict/medium/full_control。
 
 FEAT-023 内部子代理：`runtime_settings.subagents_enabled`（bool）与 `max_subagents`（1–32）可在会话或 turn 级设置，省略时沿用本机配置 `defaults.subagents_enabled`/`max_subagents`（配置值超过 32 时按 32 生效）；`accepted_runtime_settings` 回显实际值，越界返回 `unsupported_setting`。关闭时根 Agent 不暴露 `delegate_task`。
 
 `mcp_servers` is an array of enabled local allowlist names and `mcp_toolsets` maps each selected server to exact configured toolset names. They are selection references only: the bridge rejects an unknown/disabled server, a toolset whose server is not selected, or an unknown toolset with `unsupported_capability`. The request schema has no field for MCP URL, transport, header, credential, arbitrary remote tool, Web or Browser. Unsupported `reasoning_effort` and enum values fail with `unsupported_setting`.
 
-## 模型配置 RPC（纯 schema 5 目标边界）
+## 模型配置 RPC（schema 6）
 
-2026-09-15 冻结 [Provider 地址契约](provider-endpoint-ownership.md)，状态 `in_progress`。配置使用显式 `version = 6`，Model 必须携带逐 ID 的非空、有序 `supported_protocols` 列表，路由使用第一项决定协议；Provider 对象不含 `protocol`；其余仍为 Vendor/Model/Provider 与独立 Credential 后备引用。运行期环境变量只通过 `rivo run --api-key-env <name>` 提供。已支持的旧 Profile/Binding/Endpoint 文件表示由本机加载入口按[持久化文件兼容与自动升级契约](persistence-file-compatibility.md)转换；旧本地 Model 缺少协议集合时不能安全推断，整体拒绝且零写入。迁移后的未知字段或不安全语义整体拒绝；不新增旧 payload、兼容 RPC 或双格式运行路径。握手为 `rivo-app-server-v2`；配置 schema 版本与握手版本独立，宿主须同步更新字段，不以老 payload 偷渡新契约。
+字段遵循 [Provider 地址契约](provider-endpoint-ownership.md)。配置使用显式 `version = 6`，Model 必须携带逐 ID 的非空、有序 `supported_protocols` 列表，路由使用第一项决定协议；Provider 对象不含 `protocol`；其余仍为 Vendor/Model/Provider 与独立 Credential 后备引用。运行期环境变量只通过 `rivo run --api-key-env <name>` 提供。已支持的旧 Profile/Binding/Endpoint 文件表示由本机加载入口按[持久化文件兼容与自动升级契约](persistence-file-compatibility.md)转换；旧本地 Model 缺少协议集合时不能安全推断，整体拒绝且零写入。迁移后的未知字段或不安全语义整体拒绝；不新增旧 payload、兼容 RPC 或双格式运行路径。握手为 `rivo-app-server-v2`；配置 schema 版本与握手版本独立，宿主须同步更新字段，不以老 payload 偷渡新契约。
 
 下表为模型域目标方法；沿用既有传输授权、请求大小和幂等边界，不因字段变化给 Named Pipe/A2A/LAN 新增配置能力。所有变更请求仍需 `idempotency_key`；表中省略该公共字段。`read/preview/validate/delete_plan` 离线且不落盘，调用配置 RPC 不隐式 refresh。
 
@@ -146,7 +146,7 @@ The server emits JSON-RPC notifications only through `event`:
 - `turn_complete`: `{"outcome":"completed|interrupted|failed"}`. There is exactly one terminal event for an accepted turn. `completed` 另附 `usage`：`{"input_tokens":n,"output_tokens":n,"total_tokens":n}`，提供方上报时再附 `reasoning_tokens`、`cache_read_input_tokens`；计数为本 Turn 全部模型调用之和（含工具轮次与被重试的空响应），不含子代理。`interrupted`/`failed` 不保证带 `usage`，宿主须按可选字段处理。
 - `error`: `{"code":"<stable-code>","retryable":false,"message":"<redacted-message>"}`.
 
-Session 的成功选择事件为 `ModelSelected { selection, route }`（serde type 为 `model_selected`），Intent 为 `SelectModel`（`select_model`）；不是新增 JSON-RPC method。当前 bridge 不直接转发该事件为同名 notification，而在运行开始的 `status` 中投影实际 `selection/route`；宿主不得等待一个未提供的选择通知。它不改变 `seq` 或 `turn_complete` 的唯一终态规则。旧模型选择事件不解码；新会话恢复规则见 Dev Ready 契约。
+Session 的成功选择事件为 `ModelSelected { selection, route }`（serde type 为 `model_selected`），Intent 为 `SelectModel`（`select_model`）；不是新增 JSON-RPC method。当前 bridge 不直接转发该事件为同名 notification，而在运行开始的 `status` 中投影实际 `selection/route`；宿主不得等待一个未提供的选择通知。它不改变 `seq` 或 `turn_complete` 的唯一终态规则。旧模型选择事件不解码；新会话恢复规则见 [Session 与交互面](interaction-surface.md)。
 
 ## Errors and data boundary
 

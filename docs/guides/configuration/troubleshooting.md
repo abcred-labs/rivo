@@ -1,7 +1,7 @@
 # 配置故障排查
 
 - 适用版本：V1 Windows 11 x64 本地预览。
-- 功能状态：`in_progress`；schema 5 以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准，用户文件升级以[持久化文件兼容与自动升级契约](../../architecture/persistence-file-compatibility.md)为准。
+- 接口边界：schema 6 以[地址归属契约](../../architecture/provider-endpoint-ownership.md)为准，用户文件升级以[持久化文件兼容与自动升级契约](../../architecture/persistence-file-compatibility.md)为准。
 
 ## 症状与处理
 
@@ -18,7 +18,7 @@
 | 路由被拒绝 | Provider disabled、刷新失败、指纹不符或不含精确 Model ID。 | 用 `provider show` 查看脱敏状态；修复连接后重新刷新。 |
 | `validate` 通过但仍不能运行 | `validate` 只验证本地结构。 | 执行 refresh，并用 `config route` 与最小真实请求验证。 |
 | 更新/删除无法提交 | 影响计划未确认，或 revision 已变更。 | 重新生成计划，核对影响后使用新的确认信息。 |
-| 旧配置或旧会话不能恢复 | 历史配置文件的迁移器尚未交付、文件无法安全迁移，或 SQLite 会话 schema 不受本规范覆盖。 | 对已支持历史 `config.toml`、`credentials.toml`、`instances.json` 使用自动升级；只有旧会话 schema 或无法安全迁移的文件按受控流程处理，并保留 Credential、记忆、MCP 和 A2A 数据。 |
+| 旧配置或旧会话不能恢复 | 文件不在支持的历史格式中、无法安全迁移，或 SQLite 会话 schema 不受配置迁移规范覆盖。 | 对已支持历史 `config.toml`、`credentials.toml`、`instances.json` 使用自动升级；只有旧会话 schema 或无法安全迁移的文件按受控流程处理，并保留 Credential、记忆、MCP 和 A2A 数据。 |
 
 ## 最小检查序列
 

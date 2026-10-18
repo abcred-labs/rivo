@@ -17,7 +17,9 @@ macOS 可使用 `shasum -a 256 -c`；Windows PowerShell 可使用：
 Get-Content .\rivo-<version>-windows-amd64.zip.sha256
 ```
 
-确认摘要相同后解压归档，将 `rivo`（Windows 为 `rivo.exe`）放入用户自己的 PATH。归档内还包含 LICENSE、语言资源和浏览器扩展资源。
+确认摘要相同后解压，保持归档目录完整，将该目录加入用户自己的 PATH。归档内包含 LICENSE、完整第三方声明、语言资源，以及 Windows 专属的浏览器扩展资源。归档未做平台代码签名；SHA-256 用于校验文件完整性，不等同于发布者身份签名。
+
+五个目标均须在各自原生 runner 验收。Windows 系统集成以 Windows 11 x64 为使用边界；Linux/macOS 不提供 Windows 专属终端、Computer Use 和浏览器扩展接线。Linux 归档为 GNU/glibc 目标，不是 musl/Alpine 构件；尚未声明旧发行版或旧 macOS 的兼容性。具体 runner、验证结果与限制见[发布流程](../runbooks/releasing.md)。
 
 ## 从源码构建
 
