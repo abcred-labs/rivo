@@ -77,13 +77,21 @@ jobs:
       - name: Test
         if: runner.os != 'Windows'
         working-directory: runtime
-        run: cargo test --workspace --all-targets --locked
+        run: cargo test --workspace --all-targets --locked --exclude rivo --exclude rivo-tools
       - name: Test (Windows workspace)
         if: runner.os == 'Windows'
         working-directory: runtime
-        run: cargo test --workspace --all-targets --locked --exclude rivo-tools
-      - name: Test (Windows tools serialized)
-        if: runner.os == 'Windows'
+        run: cargo test --workspace --all-targets --locked --exclude rivo --exclude rivo-tools
+      - name: Test (CLI unit)
+        working-directory: runtime
+        run: cargo test -p rivo --lib --bins --locked
+      - name: Test (CLI black box serialized)
+        working-directory: runtime
+        run: cargo test -p rivo --test cli_black_box --locked -- --test-threads=1
+      - name: Test (CLI schema serialized)
+        working-directory: runtime
+        run: cargo test -p rivo --test schema3_config --locked -- --test-threads=1
+      - name: Test (tools serialized)
         working-directory: runtime
         run: cargo test -p rivo-tools --lib --locked -- --test-threads=1
       - name: Markdown links
