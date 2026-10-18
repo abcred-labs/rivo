@@ -20,6 +20,18 @@ fn lock_app_server_test() -> MutexGuard<'static, ()> {
         .expect("app-server test lock poisoned")
 }
 
+fn app_server_test_timeout() -> Duration {
+    // Named-pipe and child-process startup can be delayed on shared Windows
+    // runners. These tests validate message ordering and cleanup, not startup
+    // latency, so give the Windows runner additional room before declaring the
+    // bridge stalled.
+    if cfg!(windows) {
+        Duration::from_secs(30)
+    } else {
+        Duration::from_secs(10)
+    }
+}
+
 fn binary() -> &'static Path {
     Path::new(env!("CARGO_BIN_EXE_rivo"))
 }
@@ -2441,7 +2453,7 @@ fn e2e_app_server_pipe_keeps_delivering_events_past_the_stdio_queue_capacity() {
     // otherwise keep the scripted provider connection open forever.
     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         runtime.block_on(async {
-        let deadline = Instant::now() + Duration::from_secs(10);
+        let deadline = Instant::now() + app_server_test_timeout();
         let client = loop {
             match tokio::net::windows::named_pipe::ClientOptions::new().open(&endpoint) {
                 Ok(client) => break client,
@@ -2456,7 +2468,7 @@ fn e2e_app_server_pipe_keeps_delivering_events_past_the_stdio_queue_capacity() {
         async fn next<R: tokio::io::AsyncBufRead + Unpin>(
             lines: &mut tokio::io::Lines<R>,
         ) -> serde_json::Value {
-            let line = tokio::time::timeout(Duration::from_secs(10), lines.next_line())
+            let line = tokio::time::timeout(app_server_test_timeout(), lines.next_line())
                 .await
                 .expect("pipe stopped delivering messages")
                 .unwrap()
@@ -2528,7 +2540,7 @@ fn e2e_app_server_subagent_projects_lifecycle_child_tools_and_approval() {
     });
     let next_message = || {
         messages_rx
-            .recv_timeout(Duration::from_secs(10))
+            .recv_timeout(app_server_test_timeout())
             .expect("app-server did not produce the expected response/event")
     };
 
@@ -2750,7 +2762,7 @@ fn e2e_app_server_session_messaging_holds_approves_and_delivers_between_sessions
     let mut seen = Vec::<serde_json::Value>::new();
     let mut wait_for = |predicate: &dyn Fn(&serde_json::Value) -> bool| loop {
         let message = messages_rx
-            .recv_timeout(Duration::from_secs(10))
+            .recv_timeout(app_server_test_timeout())
             .unwrap_or_else(|_| panic!("app-server stalled; seen={seen:?}"));
         seen.push(message.clone());
         if predicate(&message) {
@@ -2923,7 +2935,7 @@ fn e2e_app_server_approval_continues_same_tool_call_and_writes_file() {
     });
     let next_message = || {
         messages_rx
-            .recv_timeout(Duration::from_secs(10))
+            .recv_timeout(app_server_test_timeout())
             .expect("app-server did not produce the expected response/event")
     };
 
