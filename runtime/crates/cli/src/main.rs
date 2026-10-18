@@ -744,13 +744,10 @@ async fn run_upgrade_command(args: Vec<String>) -> anyhow::Result<()> {
         );
         return Ok(());
     }
-    let check_only = match args.as_slice() {
-        [] => false,
-        [check] if check == "--check" => true,
+    match args.as_slice() {
+        [] => {}
+        [check] if check == "--check" => {}
         _ => anyhow::bail!("Usage: rivo upgrade [--check]"),
-    };
-    if !check_only {
-        anyhow::bail!("V1 CLI archive releases do not support automatic installation; download the matching archive, verify SHA256SUMS, and replace the rivo binary manually");
     }
     upgrade::run().await
 }
@@ -6371,7 +6368,7 @@ async fn first_launch_form(workspace: &std::path::Path) -> anyhow::Result<FirstL
     let mut selected = 0usize;
     loop {
         terminal.draw(|frame| {
-            let area = frame.size();
+            let area = frame.area();
             frame.render_widget(ratatui::widgets::Clear, area);
             let lines = std::iter::once(ui::text(
                 "cli-tui-first-launch-title",

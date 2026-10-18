@@ -38,6 +38,52 @@ fn run(environment: &TestEnvironment, args: &[&str]) -> rivo_test_support::CliOu
         .unwrap()
 }
 
+#[test]
+fn archive_upgrade_defaults_to_read_only_check_and_accepts_check_flag() {
+    let binary_digest = Sha256::digest(std::fs::read(binary()).unwrap());
+    for args in [vec!["upgrade"], vec!["upgrade", "--check"]] {
+        let environment = schema3_environment();
+        let before = std::fs::read(environment.config_path()).unwrap();
+        let platform = std::env::consts::OS;
+        let arch = match std::env::consts::ARCH {
+            "x86_64" => "amd64",
+            "aarch64" => "arm64",
+            other => panic!("unsupported test architecture: {other}"),
+        };
+        let server = ScriptedHttpServer::start(vec![HttpResponse::json(
+            serde_json::json!({
+                "schema": 2, "product": "rivo", "version": "999.0.0",
+                "platform": platform, "arch": arch,
+            })
+            .to_string(),
+        )])
+        .unwrap();
+        let output = environment
+            .command(binary())
+            .args(args)
+            .env("RIVO_RELEASE_BASE_URL", server.base_url())
+            .run()
+            .unwrap();
+        output.assert_success();
+        assert!(output.stdout.contains("999.0.0"));
+        let requests = server.finish();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(
+            requests[0].request_line,
+            format!("GET /{platform}-{arch}/release-manifest.json HTTP/1.1")
+        );
+        assert_eq!(std::fs::read(environment.config_path()).unwrap(), before);
+        assert_eq!(
+            std::fs::read_dir(environment.data_dir()).unwrap().count(),
+            0
+        );
+    }
+    assert_eq!(
+        Sha256::digest(std::fs::read(binary()).unwrap()),
+        binary_digest
+    );
+}
+
 fn set_test_credential(environment: &TestEnvironment, name: &str) {
     environment
         .command(binary())

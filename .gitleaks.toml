@@ -1,0 +1,17 @@
+# 仅排除已核实的公开 SPKI key 和两个固定单元测试字面量，不忽略整个文件。
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Chrome/Edge Manifest V3 developer public key (SPKI, not a secret)"
+condition = "AND"
+paths = ['^packaging/browser-extension/manifest\.json$']
+regexTarget = "secret"
+regexes = ['^MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArOuj5xmbVN/6twfG11PBZCjMYVRcbxM\+a43w91uodEmmo9Vt6o1BfU7TH7bksNZRw1z4ZaostkL0ckCu7xHTcMYm\+wmArALtvI\+n\+\+DMbyfTXmbZ1/ktZvObgyno4a3vpBIzQ5ZuxS9oAsgtnQAVNymzfy9AdB9WTtb\+H2ZnsejxItxa3PFWW3B5G4kHltMowQIlyskL7917Kt8byLz8CYnmKW4qspumjuxHba1G7x7YAfzwhaws1d6erzw\+rTI\+4wnm1b1Y90gADTu\+bBcW/ydnYz6OkVcHTynYS8CUO1gchCR32qh5W0NravnB0nd4\+jVBnXuVWofieVqkEmrpaQIDAQAB$']
+
+[[allowlists]]
+description = "Fixed masking/decryption unit-test values inside xtask test module"
+condition = "AND"
+paths = ['^runtime/crates/xtask/src/main\.rs$']
+regexTarget = "secret"
+regexes = ['^abcd1234567890wxyz$', '^test\-key\-123456$']

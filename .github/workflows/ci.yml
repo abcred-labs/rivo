@@ -4,11 +4,45 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
+  msrv:
+    name: Rust 1.88 minimum version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install minimum toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Check minimum supported Rust
+        working-directory: runtime
+        run: cargo +1.88.0 check --workspace --exclude xtask --all-targets --locked
+
+  dependencies:
+    name: Dependency security and licenses
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.x'
+      - uses: taiki-e/install-action@8cca0918f8471c33515202b73f56ab27f2bed283 # v2
+        with:
+          tool: cargo-about@0.9.2,cargo-audit@0.22.2,gitleaks@8.30.1,actionlint@1.7.12
+      - name: Secret history and workflow checks
+        run: |
+          gitleaks git --redact=100 --no-banner --log-opts=--all
+          actionlint
+      - name: RustSec (including unsound, unmaintained and yanked dependencies)
+        run: cargo audit --file runtime/Cargo.lock --deny warnings
+      - name: Complete, current dependency notices
+        run: python scripts/generate_licenses.py --check
+
   quality:
     name: Quality (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -17,10 +51,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.x'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
       - name: Format
         working-directory: runtime
         run: cargo fmt --all -- --check
@@ -39,3 +76,6 @@ jobs:
         run: |
           python -m compileall -q scripts packaging
           python scripts/package-test.py
+          python scripts/check_browser_extension.py
+      - name: Browser extension tests
+        run: node --test packaging/browser-extension/tests/content-script.test.mjs packaging/browser-extension/tests/service-worker.test.mjs
