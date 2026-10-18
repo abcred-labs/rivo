@@ -2170,10 +2170,9 @@ mod tests {
             command: "echo shell-ok".into(),
             cwd: temp.path().into(),
             shell: ShellKind::Default,
-            // PowerShell startup on shared Windows runners can exceed one
-            // second while the workspace test suite is running in parallel;
-            // this test is about confirmation binding, not startup latency.
-            timeout_ms: 30_000,
+            // PowerShell startup can be slow on shared Windows runners; this
+            // test is about confirmation binding, not startup latency.
+            timeout_ms: 120_000,
             output_limit: 1024,
             environment_allowlist: vec![],
         };
@@ -2303,7 +2302,7 @@ mod tests {
             shell: ShellKind::Default,
             // Allow the platform shell to start under a busy CI runner before
             // asserting the output bound and timeout behavior below.
-            timeout_ms: 30_000,
+            timeout_ms: 120_000,
             output_limit: 64,
             environment_allowlist: vec![],
         };
