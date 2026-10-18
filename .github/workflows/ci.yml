@@ -78,10 +78,14 @@ jobs:
         if: runner.os != 'Windows'
         working-directory: runtime
         run: cargo test --workspace --all-targets --locked
-      - name: Test (serialized on Windows)
+      - name: Test (Windows workspace)
         if: runner.os == 'Windows'
         working-directory: runtime
-        run: cargo test --workspace --all-targets --locked -- --test-threads=1
+        run: cargo test --workspace --all-targets --locked --exclude rivo-tools
+      - name: Test (Windows tools serialized)
+        if: runner.os == 'Windows'
+        working-directory: runtime
+        run: cargo test -p rivo-tools --lib --locked -- --test-threads=1
       - name: Markdown links
         run: python scripts/check_markdown_links.py
       - name: Python checks
