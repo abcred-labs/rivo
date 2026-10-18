@@ -3,6 +3,7 @@
 *.md text eol=lf
 *.rs text eol=lf
 *.toml text eol=lf
+*.proto text eol=lf
 *.ftl text eol=lf
 *.lock text eol=lf
 *.json text eol=lf
