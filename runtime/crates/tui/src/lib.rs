@@ -2045,8 +2045,8 @@ pub fn main_scroll_offset(
 }
 
 pub fn render(frame: &mut Frame<'_>, state: &AppState) {
-    if layout_profile(frame.size().width, frame.size().height) == LayoutProfile::TooSmall {
-        let size = frame.size();
+    if layout_profile(frame.area().width, frame.area().height) == LayoutProfile::TooSmall {
+        let size = frame.area();
         frame.render_widget(
             Paragraph::new(format!(
                 "{} {}x{}; {} 60x20. {}",
@@ -2066,7 +2066,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
         return;
     }
     if let Some(startup) = &state.startup {
-        let area = centered_rect(82, 82, frame.size());
+        let area = centered_rect(82, 82, frame.area());
         frame.render_widget(ratatui::widgets::Clear, area);
         frame.render_widget(
             panel_block(
@@ -2120,7 +2120,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
             Constraint::Length(4),
             Constraint::Length(1),
         ])
-        .split(frame.size());
+        .split(frame.area());
     // 顶部品牌 header：左侧 Rivo，右侧会话 / 模型 / context / 阶段指示。
     let brand = COMPACT_BRAND;
     let header_split = Layout::default()
@@ -2186,9 +2186,9 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
     );
     let confirmation_detail = state.confirmation_detail();
     let confirmation = String::new();
-    let main_width = match layout_profile(frame.size().width, frame.size().height) {
-        LayoutProfile::Wide | LayoutProfile::Overlay => frame.size().width.saturating_sub(28),
-        _ => frame.size().width,
+    let main_width = match layout_profile(frame.area().width, frame.area().height) {
+        LayoutProfile::Wide | LayoutProfile::Overlay => frame.area().width.saturating_sub(28),
+        _ => frame.area().width,
     } as usize;
     let answer = render_markdown_blocks(
         &conversation_text(state, main_width.saturating_sub(2)),
@@ -2214,7 +2214,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
     // Claude 风格：会话区去边框，靠内联气泡（●/>/⏺/⎿）与留白区分角色。
     let sidebar_focused = matches!(state.focus, FocusTarget::Activity | FocusTarget::Drawer);
     let main = Paragraph::new(main_text).scroll((main_scroll, state.main_horizontal));
-    if layout_profile(frame.size().width, frame.size().height) == LayoutProfile::Wide {
+    if layout_profile(frame.area().width, frame.area().height) == LayoutProfile::Wide {
         let split = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([Constraint::Min(1), Constraint::Length(28)])
@@ -2234,7 +2234,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
         );
     } else {
         frame.render_widget(main, areas[1]);
-        if layout_profile(frame.size().width, frame.size().height) == LayoutProfile::Overlay
+        if layout_profile(frame.area().width, frame.area().height) == LayoutProfile::Overlay
             && state.focus == FocusTarget::Drawer
         {
             let drawer = centered_rect(72, 70, areas[1]);
@@ -2307,7 +2307,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
                     .min(u16::MAX as usize) as u16,
             )
             .min(areas[2].bottom().saturating_sub(1));
-        frame.set_cursor(x, y);
+        frame.set_cursor_position((x, y));
     }
     // 底部 dim 快捷键提示条，随当前焦点/弹层给出上下文快捷键。
     let keyhint = match state.active_overlay() {
@@ -2355,7 +2355,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
     let active_overlay = state.active_overlay();
     if active_overlay == Some(ActiveOverlay::CommandPalette) {
         let popup = ratatui::widgets::Clear;
-        frame.render_widget(popup, frame.size());
+        frame.render_widget(popup, frame.area());
         let (start, suggestions) = state.command_suggestion_window(8);
         let selected = state
             .command_index
@@ -2391,7 +2391,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
                 localized(state, "command-palette-title", "✻ Command Palette"),
                 true,
             )),
-            centered_rect(60, 30, frame.size()),
+            centered_rect(60, 30, frame.area()),
         );
     }
     if active_overlay == Some(ActiveOverlay::SessionSettings) {
@@ -2399,7 +2399,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
             .session_settings
             .as_ref()
             .expect("active settings overlay");
-        let profile = layout_profile(frame.size().width, frame.size().height);
+        let profile = layout_profile(frame.area().width, frame.area().height);
         let columns = match profile {
             LayoutProfile::Wide => 4,
             LayoutProfile::Overlay => 2,
@@ -2478,7 +2478,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
             ));
         }
         let detail = lines.join("\n");
-        let popup = centered_rect(94, 88, frame.size());
+        let popup = centered_rect(94, 88, frame.area());
         frame.render_widget(ratatui::widgets::Clear, popup);
         frame.render_widget(
             Paragraph::new(fit_panel_text(
@@ -2526,7 +2526,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
                 .collect::<Vec<_>>()
                 .join("\n")
         };
-        let popup = centered_rect(82, 68, frame.size());
+        let popup = centered_rect(82, 68, frame.area());
         frame.render_widget(ratatui::widgets::Clear, popup);
         frame.render_widget(
             Paragraph::new(fit_panel_text(body, popup.width.saturating_sub(2) as usize)).block(
@@ -2537,7 +2537,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
     }
     if active_overlay == Some(ActiveOverlay::Help) {
         let help = localized(state, "help-body", "/ or F1 Command Palette\nF6 Session Settings\nUse arrows or Tab to navigate; Enter confirms or opens details; Esc closes overlays.\n\nCommands: /exit /cancel /retry /sessions /new /errors /permissions /language /settings /provider /model /network /browser /mcp /a2a /subagents /trace /memory");
-        let popup = centered_rect(76, 72, frame.size());
+        let popup = centered_rect(76, 72, frame.area());
         frame.render_widget(ratatui::widgets::Clear, popup);
         frame.render_widget(
             Paragraph::new(fit_panel_text(help, popup.width.saturating_sub(2) as usize))
@@ -2548,7 +2548,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
     }
     if active_overlay == Some(ActiveOverlay::Confirmation) {
         let detail = confirmation_detail.unwrap_or_default();
-        let popup = centered_rect(76, 58, frame.size());
+        let popup = centered_rect(76, 58, frame.area());
         frame.render_widget(ratatui::widgets::Clear, popup);
         frame.render_widget(
             Paragraph::new(fit_panel_text(
@@ -2581,7 +2581,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
                 error.cause,
                 localized(state, "diagnostic-keyhint", "r Retry · Enter/Esc Back")
             );
-            let popup = centered_rect(82, 72, frame.size());
+            let popup = centered_rect(82, 72, frame.area());
             frame.render_widget(ratatui::widgets::Clear, popup);
             frame.render_widget(
                 Paragraph::new(fit_panel_text(
@@ -2634,7 +2634,7 @@ pub fn render(frame: &mut Frame<'_>, state: &AppState) {
             "interaction-detail-keyhint",
             "↑/↓ select · 1-9 quick select · Enter submit · Esc requires an explicit response",
         ));
-        let popup = centered_rect(82, 72, frame.size());
+        let popup = centered_rect(82, 72, frame.area());
         frame.render_widget(ratatui::widgets::Clear, popup);
         frame.render_widget(
             Paragraph::new(fit_panel_text(
@@ -3402,7 +3402,10 @@ mod tests {
 
         // The input panel has a 78-cell inner width. The cursor is kept in the
         // final visible cell after the same 29-cell scroll used by the text.
-        assert_eq!(terminal.get_cursor().unwrap(), (78, 20));
+        assert_eq!(
+            <(u16, u16)>::from(terminal.get_cursor_position().unwrap()),
+            (78, 20)
+        );
     }
 
     #[test]
@@ -3420,7 +3423,10 @@ mod tests {
 
         // The two-row input viewport scrolls down one row so the third row's
         // cursor remains on the visible bottom row.
-        assert_eq!(terminal.get_cursor().unwrap(), (7, 21));
+        assert_eq!(
+            <(u16, u16)>::from(terminal.get_cursor_position().unwrap()),
+            (7, 21)
+        );
     }
 
     #[test]

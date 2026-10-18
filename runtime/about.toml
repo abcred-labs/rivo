@@ -1,0 +1,14 @@
+# 按许可证表达式选择允许的分支；不选择 GPL/LGPL 分支。
+accepted = [
+    "MIT", "Apache-2.0", "ISC", "BSD-2-Clause", "BSD-3-Clause",
+    "Unicode-3.0", "Zlib", "CDLA-Permissive-2.0", "MPL-2.0",
+]
+targets = [
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu",
+    "x86_64-apple-darwin", "aarch64-apple-darwin",
+]
+# 包含构建和开发依赖，生成覆盖整个工作区的保守声明合集。
+ignore-build-dependencies = false
+ignore-dev-dependencies = false
+ignore-transitive-dependencies = false

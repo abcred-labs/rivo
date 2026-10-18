@@ -48,7 +48,7 @@ hex = "0.4"
 libc = "0.2"
 keyring = { version = "3", features = ["windows-native", "apple-native", "sync-secret-service"] }
 regex = "1"
-ratatui = "0.27"
+ratatui = "0.30.2"
 rusqlite = { version = "0.32", features = ["bundled", "backup"] }
 reqwest = { version = "0.12", default-features = false, features = [
     "json",
@@ -90,5 +90,5 @@ clap = { version = "4", default-features = false, features = [
     "error-context",
     "suggestions",
 ] }
-crossterm = "0.27"
+crossterm = "0.29"
 

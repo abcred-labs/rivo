@@ -4,3 +4,8 @@
 *.rs text eol=lf
 *.toml text eol=lf
 *.ftl text eol=lf
+*.lock text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
