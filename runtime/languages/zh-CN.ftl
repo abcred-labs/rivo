@@ -397,7 +397,7 @@ cli-root-help = Rivo —— 通用 Agent CLI
       a2a          管理 A2A peer 和本机 A2A server
       instance     查看本机 Rivo 实例
       diagnostics  创建脱敏诊断包
-      upgrade      检查平台更新（手动下载归档）
+      upgrade      检查或应用平台更新
       app-server   启动本机 JSON-RPC bridge
 
     选项：
@@ -476,12 +476,14 @@ cli-instance-endpoint-help = 显示本机控制 endpoint。
 cli-instance-skill-help = 显示内置 process-control Skill。
 
     用法：rivo instance skill
-cli-upgrade-help = 检查当前平台的最新 CLI 归档；V1 升级需手动下载并替换二进制。
+cli-upgrade-help = 检查或应用当前平台的最新 CLI 归档。
 
     用法：rivo upgrade [选项]
 
     选项：
           --check  仅比较版本，不下载或安装
+          --apply  下载、校验并替换当前安装
+          --yes    跳过升级确认
       -h、--help   显示帮助
 cli-app-server-help = 启动本机 JSON-RPC bridge。
 

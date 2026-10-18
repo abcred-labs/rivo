@@ -16,7 +16,33 @@ Rivo 面向本地 Workspace 中用户可见的工作。每个工具请求在执�
 
 ## 安装发行版
 
-可用归档见 [GitHub Releases](https://github.com/abcred-labs/rivo/releases)；尚无公开版本时请从源码构建。运行前根据发行版提供的校验和验证归档。
+在 Linux 或 macOS 安装最新稳定版本：
+
+```sh
+curl -fsSL https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo sh
+rivo --version
+```
+
+在管理员 PowerShell 中安装 Windows 最新稳定版本：
+
+```powershell
+irm https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
+安装器会先校验 Release manifest 和 SHA-256，再安装完整归档。安装需要管理员权限，
+用户配置、Credential 和会话仍保存在安装目录之外。固定版本命令、手动归档安装和故障处理见
+[安装指南](docs/guides/one-click-install.zh-CN.md)。可用归档和各版本命令见
+[GitHub Releases](https://github.com/abcred-labs/rivo/releases)。
+
+检查并升级到更新版本：
+
+```text
+rivo upgrade --check
+rivo upgrade --apply
+```
+
+`rivo upgrade --apply` 会在终端中请求确认；非交互自动化必须追加 `--yes`，并保留一个上一版本。
 
 ## 从源码构建
 

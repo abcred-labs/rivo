@@ -56,7 +56,7 @@ def main() -> int:
     assert 'cd "' in outputs["macos"]
     for output in outputs.values():
         assert "rivo upgrade --check" in output
-        assert "installation remains manual" in output
+        assert "rivo upgrade --apply" in output
     print("archive install command checks passed")
     return 0
 

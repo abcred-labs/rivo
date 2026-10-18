@@ -1,5 +1,38 @@
 # Install Rivo CLI
 
+## Install the latest release
+
+On Linux or macOS, run the short installer with administrator privileges:
+
+```sh
+curl -fsSL https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo sh
+rivo --version
+```
+
+On Windows, open an elevated PowerShell and run:
+
+```powershell
+irm https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
+The scripts detect the supported platform and architecture, download the matching
+manifest and archive, verify both checksum sources, and install the complete
+resource directory. Unix installs use `/usr/local/lib/rivo` and
+`/usr/local/bin/rivo`; Windows installs use `%ProgramFiles%\Rivo\current` and
+the system PATH. The scripts accept `--version`, `--install-root` and `--base-url`
+(PowerShell uses the corresponding named parameters). The release archives are
+unsigned, so SHA-256 verifies integrity but does not authenticate the publisher.
+When a Unix `--install-root` other than `/usr/local/lib/rivo` is supplied, the
+launcher is written to `<install-root>/bin/rivo` so local mirror tests do not
+modify `/usr/local/bin`.
+
+The installer scripts are published as `rivo-install.sh` and `rivo-install.ps1`
+assets on every Release. The repository's `print-install-commands.py` helper only
+prints manual archive commands; it does not install or modify PATH.
+
+## Install a fixed release manually
+
 Rivo releases contain portable archives for five targets:
 
 | Target | Archive |
@@ -89,13 +122,16 @@ The build does not contact a model service and does not require credentials.
 
 ```text
 rivo upgrade --check
+rivo upgrade --apply
 ```
 
-`rivo upgrade` only compares the current version with the platform manifest. The V1
-CLI does not download, install, replace, or restart itself. Download and verify the
-new archive, stop running Rivo processes, replace the old binary directory, and run
-`rivo --version` again. User configuration, credentials and sessions are stored outside
-the release directory and are not included in an archive.
+`rivo upgrade --check` only compares the current version with the platform manifest.
+`rivo upgrade --apply` downloads and verifies the newer archive, asks for terminal
+confirmation, replaces the installation, and keeps one previous version for rollback.
+Use `rivo upgrade --apply --yes` in non-interactive automation. Stop other Rivo
+processes before applying an update; on Windows the command uses a short-lived
+replacement helper because the current executable is locked while it runs. User
+configuration, credentials and sessions are stored outside the release directory.
 
 To uninstall, remove the extracted binary directory from PATH. Remove user data only
 when you intentionally want to discard configuration, credentials, sessions and logs;

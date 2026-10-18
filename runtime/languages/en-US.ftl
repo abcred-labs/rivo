@@ -397,7 +397,7 @@ cli-root-help = Rivo — General Agent CLI
       a2a          Manage A2A peers and the local A2A server
       instance     Inspect the local Rivo instance
       diagnostics  Create a redacted diagnostics bundle
-      upgrade      Check platform updates (manual archive replacement)
+      upgrade      Check or apply platform updates
       app-server   Start the local JSON-RPC bridge
 
     Options:
@@ -476,12 +476,14 @@ cli-instance-endpoint-help = Show the local instance-control endpoint.
 cli-instance-skill-help = Show the built-in process-control Skill.
 
     Usage: rivo instance skill
-cli-upgrade-help = Check the latest CLI archive for this platform; V1 upgrades are manual archive replacements.
+cli-upgrade-help = Check or apply the latest CLI archive for this platform.
 
     Usage: rivo upgrade [OPTIONS]
 
     Options:
           --check  Compare versions without downloading or installing
+          --apply  Download, verify and replace the installed release
+          --yes    Skip the interactive apply confirmation
       -h, --help   Show help
 cli-app-server-help = Start the local JSON-RPC bridge.
 

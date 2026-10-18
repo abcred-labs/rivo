@@ -136,6 +136,19 @@ jobs:
           pattern: release-*
           path: artifacts/release-assets
           merge-multiple: true
+      - name: Add one-click installers and release notes
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          cp scripts/rivo-install.sh artifacts/release-assets/rivo-install.sh
+          cp scripts/rivo-install.ps1 artifacts/release-assets/rivo-install.ps1
+          python scripts/generate-release-notes.py \
+            --version "$VERSION" \
+            --repository "$REPOSITORY" \
+            --changelog CHANGELOG.md \
+            --output artifacts/release-body.md
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: v${{ needs.version.outputs.version }}
@@ -143,10 +156,12 @@ jobs:
           name: Rivo ${{ needs.version.outputs.version }}
           draft: true
           make_latest: false
-          body_path: CHANGELOG.md
+          body_path: artifacts/release-body.md
           files: |
             artifacts/release-assets/*.zip
             artifacts/release-assets/*.tar.gz
             artifacts/release-assets/*.sha256
             artifacts/release-assets/*.json
+            artifacts/release-assets/rivo-install.sh
+            artifacts/release-assets/rivo-install.ps1
           fail_on_unmatched_files: true

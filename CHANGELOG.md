@@ -14,7 +14,7 @@
 
 - 主配置为 schema 6，Model 的有序协议列表决定协议，Provider 保存地址及认证引用。支持的历史配置按文档迁移；无法安全迁移的输入零写入拒绝。
 - SQLite 会话 schema 为 18；schema 17 的 Workspace 迁移必须显式备份并确认，不随普通启动静默执行。其他旧会话请按存储兼容规则处理，不删除整个数据目录。
-- `rivo upgrade` 只查询 GitHub Releases，不自动安装；下载并校验后保留归档完整目录，手动替换。凭据与用户数据不得随包分发。
+- `rivo upgrade --check` 只查询 GitHub Releases；`rivo upgrade --apply` 会下载并校验归档，确认后原子替换安装并保留一个上一版本。凭据与用户数据不得随包分发。
 
 ### 已知限制
 

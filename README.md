@@ -16,7 +16,36 @@ The repository does not provide a hosted gateway, multi-tenant execution service
 
 ## Install a release
 
-Available archives are listed on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases). If no version has been published yet, build from source. Verify the release checksums before running an archive.
+Install the latest stable release on Linux or macOS:
+
+```sh
+curl -fsSL https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo sh
+rivo --version
+```
+
+Install the latest stable release on Windows from an elevated PowerShell:
+
+```powershell
+irm https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
+The installers verify the release manifest and SHA-256 checksum before installing
+the complete archive. They require administrator privileges and install the
+system-wide CLI while keeping user configuration, credentials and sessions outside
+the installation directory. For fixed-version commands, manual archive installs,
+and troubleshooting, see the [installation guide](docs/guides/one-click-install.md).
+Available archives and release-specific commands are listed on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases).
+
+Check for and apply a newer release:
+
+```text
+rivo upgrade --check
+rivo upgrade --apply
+```
+
+`rivo upgrade --apply` asks for confirmation in a terminal, preserves one previous
+installation, and requires `--yes` in non-interactive automation.
 
 ## Build from source
 

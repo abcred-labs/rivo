@@ -739,17 +739,25 @@ async fn run_upgrade_command(args: Vec<String>) -> anyhow::Result<()> {
             "{}",
             ui::text(
                 "cli-upgrade-help",
-                "Check the latest archive for this platform. Installation is manual in the V1 CLI release.\n\nUsage: rivo upgrade [OPTIONS]\n\nOptions:\n      --check  Compare versions without downloading or installing\n  -h, --help   Show help",
+                "Check or apply the latest archive for this platform.\n\nUsage: rivo upgrade [OPTIONS]\n\nOptions:\n      --check  Compare versions without downloading or installing\n      --apply  Download, verify and replace the installed release\n      --yes    Skip the interactive apply confirmation\n  -h, --help   Show help",
             )
         );
         return Ok(());
     }
-    match args.as_slice() {
-        [] => {}
-        [check] if check == "--check" => {}
-        _ => anyhow::bail!("Usage: rivo upgrade [--check]"),
+    let mut apply = false;
+    let mut yes = false;
+    for arg in args {
+        match arg.as_str() {
+            "--check" if !apply => {}
+            "--apply" if !apply => apply = true,
+            "--yes" if apply && !yes => yes = true,
+            _ => anyhow::bail!("Usage: rivo upgrade [--check | --apply [--yes]]"),
+        }
     }
-    upgrade::run().await
+    if yes && !apply {
+        anyhow::bail!("--yes requires --apply")
+    }
+    upgrade::run(apply, yes).await
 }
 
 /// A panic in a TUI reducer, renderer, or input path must not strand the user

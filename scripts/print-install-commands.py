@@ -65,8 +65,9 @@ def main() -> int:
     print("Copyable archive commands:")
     for command in commands:
         print(f"  {command}")
-    print("Upgrade check (installation remains manual):")
+    print("Upgrade commands:")
     print("  rivo upgrade --check")
+    print("  rivo upgrade --apply")
     print("The checksum output must match the first field in the .sha256 sidecar.")
     return 0
 

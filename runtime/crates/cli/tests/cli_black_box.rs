@@ -96,6 +96,16 @@ fn archive_upgrade_defaults_to_read_only_check_and_accepts_check_flag() {
     );
 }
 
+#[test]
+fn upgrade_help_exposes_apply_and_noninteractive_confirmation() {
+    let environment = schema3_environment();
+    let output = run(&environment, &["upgrade", "--help"]);
+    output.assert_success();
+    assert!(output.stdout.contains("--check"));
+    assert!(output.stdout.contains("--apply"));
+    assert!(output.stdout.contains("--yes"));
+}
+
 fn set_test_credential(environment: &TestEnvironment, name: &str) {
     environment
         .command(binary())

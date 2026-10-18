@@ -103,6 +103,7 @@ jobs:
           python -m compileall -q scripts packaging
           python scripts/package-test.py
           python scripts/install-command-test.py
+          python scripts/installer-test.py
           python scripts/check_browser_extension.py
       - name: Browser extension tests
         run: node --test packaging/browser-extension/tests/content-script.test.mjs packaging/browser-extension/tests/service-worker.test.mjs
