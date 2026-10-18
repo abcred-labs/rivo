@@ -75,8 +75,13 @@ jobs:
         working-directory: runtime
         run: cargo build --workspace --all-targets --locked
       - name: Test
+        if: runner.os != 'Windows'
         working-directory: runtime
         run: cargo test --workspace --all-targets --locked
+      - name: Test (serialized on Windows)
+        if: runner.os == 'Windows'
+        working-directory: runtime
+        run: cargo test --workspace --all-targets --locked -- --test-threads=1
       - name: Markdown links
         run: python scripts/check_markdown_links.py
       - name: Python checks
