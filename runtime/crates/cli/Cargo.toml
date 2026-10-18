@@ -1,5 +1,6 @@
 [package]
 name = "rivo"
+default-run = "rivo"
 description = "Rivo —— 通用 Agent CLI"
 build = "build.rs"
 edition.workspace = true
