@@ -97,6 +97,8 @@ def main() -> int:
         assert metadata["sha256"] == digest
         with zipfile.ZipFile(archive) as handle:
             names = set(handle.namelist())
+            assert handle.read(f"rivo-{version}-windows-amd64/THIRD_PARTY_NOTICES.md") == (ROOT / "THIRD_PARTY_NOTICES.md").read_bytes()
+            assert handle.read(f"rivo-{version}-windows-amd64/share/rivo/licenses/LICENSE-A2A") == (ROOT / "runtime/crates/a2a/protocol/v1.0.1/LICENSE-A2A").read_bytes()
             assert handle.read(f"rivo-{version}-windows-amd64/README.md") == (ROOT / "packaging/archive/README.md").read_bytes()
             assert handle.read(f"rivo-{version}-windows-amd64/share/rivo/examples/mock_provider.py") == (ROOT / "packaging/archive/mock_provider.py").read_bytes()
         assert f"rivo-{version}-windows-amd64/rivo.exe" in names
@@ -140,6 +142,9 @@ def main() -> int:
             prefix = f"rivo-{version}-{platform}-{arch}"
             assert f"{prefix}/rivo" in names
             assert f"{prefix}/README.md" in names
+            assert f"{prefix}/THIRD_PARTY_NOTICES.md" in names
+            assert f"{prefix}/share/rivo/licenses/LICENSE-A2A" in names
+            assert f"{prefix}/share/rivo/licenses/protocol-manifest.toml" in names
             assert f"{prefix}/share/rivo/examples/mock_provider.py" in names
             assert not any("browser-extension" in name for name in names)
             assert f"{prefix}/share/rivo/brand/rivo-mark.svg" in names

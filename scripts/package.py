@@ -82,6 +82,12 @@ def main() -> int:
             raise SystemExit(f"bundled language file missing: {source}")
         shutil.copy2(source, language_target / source.name)
     shutil.copy2(Path("LICENSE"), staging / "LICENSE")
+    shutil.copy2(Path("THIRD_PARTY_NOTICES.md"), staging / "THIRD_PARTY_NOTICES.md")
+    upstream = Path("runtime/crates/a2a/protocol/v1.0.1")
+    notices = staging / "share" / "rivo" / "licenses"
+    notices.mkdir(parents=True)
+    for filename in ("LICENSE-A2A", "protocol-manifest.toml"):
+        shutil.copy2(upstream / filename, notices / filename)
     shutil.copy2(Path("packaging/archive/README.md"), staging / "README.md")
     examples_target = staging / "share" / "rivo" / "examples"
     examples_target.mkdir(parents=True)
