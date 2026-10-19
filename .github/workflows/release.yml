@@ -120,7 +120,7 @@ jobs:
               /usr/local/bin/rivo --version
               /usr/local/bin/rivo --help >/dev/null
               mkdir -p /tmp/rivo-smoke
-              printf 'version = 6\n' >/tmp/rivo-smoke/config.toml
+              printf "version = 6\\n" >/tmp/rivo-smoke/config.toml
               RIVO_CONFIG=/tmp/rivo-smoke/config.toml RIVO_DATA_DIR=/tmp/rivo-smoke/data \
                 /usr/local/bin/rivo config validate
             '

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.8（2026-10-19）
+
+### 兼容与发布
+
+- 保持 Linux 发布构件的 Debian 12（glibc 2.36）最低支持基线、Ubuntu 22.04 构建和 Debian 12 smoke 验证。
+- 修正 Debian 12 smoke 配置写入脚本的 ShellCheck 兼容性，确保 Release 门禁在启用 workflow lint 后通过。
+
 ## 0.2.7（2026-10-19）
 
 ### 兼容与发布
