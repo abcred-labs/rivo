@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.5（2026-10-19）
+
+### 兼容与发布
+
+- Linux 发布构件改用 Ubuntu 22.04 构建，并在 Debian 12（glibc 2.36）容器中验证，支持 Debian 12 及更新的兼容 GNU/glibc 系统。
+- Release CI 增加 GLIBC ABI 上限检查，防止构件重新依赖 Debian 12 不提供的更高版本符号。
+- Windows 安装器加强 manifest、归档和 SHA-256 sidecar 校验。
+
 ## 0.2.0（2026-10-18）
 
 首个 MIT 开源版本。
