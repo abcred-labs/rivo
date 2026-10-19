@@ -9,7 +9,7 @@ sha256sum -c rivo-<version>-linux-amd64.tar.gz.sha256
 tar -xzf rivo-<version>-linux-amd64.tar.gz
 ```
 
-macOS 使用 `shasum -a 256 -c`，Windows 使用 PowerShell `Get-FileHash`。Linux 归档需要 glibc 和 `libdbus-1.so.3`，不是 musl/Alpine 包。
+macOS 使用 `shasum -a 256 -c`，Windows 使用 PowerShell `Get-FileHash`。Linux 归档支持 Debian 12（glibc 2.36）及更新的兼容 GNU/glibc 系统，需要 `libdbus-1.so.3`，不是 musl/Alpine 包。
 
 ## 首次检查
 

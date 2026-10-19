@@ -35,6 +35,8 @@ rivo --version
 [安装指南](docs/guides/one-click-install.zh-CN.md)。可用归档和各版本命令见
 [GitHub Releases](https://github.com/abcred-labs/rivo/releases)。
 
+Linux 发布归档支持 Debian 12（glibc 2.36）及更新的兼容 GNU/glibc 系统，并需要 `libdbus-1.so.3`。
+
 检查并升级到更新版本：
 
 ```text

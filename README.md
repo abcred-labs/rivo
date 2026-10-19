@@ -37,6 +37,8 @@ the installation directory. For fixed-version commands, manual archive installs,
 and troubleshooting, see the [installation guide](docs/guides/one-click-install.md).
 Available archives and release-specific commands are listed on the [GitHub Releases page](https://github.com/abcred-labs/rivo/releases).
 
+Linux release archives support Debian 12 (glibc 2.36) and newer compatible GNU/glibc systems, and require `libdbus-1.so.3`.
+
 Check for and apply a newer release:
 
 ```text

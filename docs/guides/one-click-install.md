@@ -87,7 +87,8 @@ checksum does not authenticate the publisher.
 Keep the extracted directory together. It contains `LICENSE`, third-party notices,
 English and Chinese language resources, and the example loopback provider. Windows
 also contains the browser-extension host and extension resources. Linux archives are
-GNU/glibc builds and require `libdbus-1.so.3`; musl/Alpine is not a supported target.
+GNU/glibc builds support Debian 12 (glibc 2.36) and newer compatible systems and
+require `libdbus-1.so.3`; musl/Alpine is not a supported target.
 
 For a copyable command list, run the print-only helper from the repository:
 

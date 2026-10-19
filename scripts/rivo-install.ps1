@@ -49,17 +49,27 @@ try {
     if ($manifest.platform -ne 'windows' -or $manifest.arch -ne 'amd64') { throw 'Release manifest target mismatch.' }
     if ($manifest.version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') { throw 'Invalid release version.' }
     if ($Version -ne 'latest' -and $Version -ne $manifest.version) { throw "Requested version $Version does not match manifest $($manifest.version)." }
-    $artifact = $manifest.artifacts[0]
+    $artifacts = @($manifest.artifacts)
+    if ($artifacts.Count -ne 1 -or $null -eq $artifacts[0]) { throw 'Release manifest must contain exactly one artifact.' }
+    $artifact = $artifacts[0]
     $expectedName = "rivo-$($manifest.version)-windows-amd64.zip"
-    if ($artifact.file -ne $expectedName) { throw 'Release artifact does not match the target.' }
+    if ([string]::IsNullOrWhiteSpace([string]$artifact.file) -or $artifact.file -ne $expectedName) { throw 'Release artifact does not match the target.' }
+    $manifestSha = [string]$artifact.sha256
+    if ($manifestSha -notmatch '^[0-9a-fA-F]{64}$') { throw 'Release manifest contains an invalid artifact checksum.' }
     $artifactBase = if ($mirror) { "$BaseUrl/windows-amd64" } else { $BaseUrl }
     $archive = Join-Path $temp $artifact.file
     $sidecar = "$archive.sha256"
     Invoke-WebRequest -UseBasicParsing -Uri "$artifactBase/$($artifact.file)" -OutFile $archive
     Invoke-WebRequest -UseBasicParsing -Uri "$artifactBase/$($artifact.file).sha256" -OutFile $sidecar
-    $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant()
-    $declared = ((Get-Content -Raw -LiteralPath $sidecar).Trim() -split '\s+')[0].ToLowerInvariant()
-    if ($actual -ne $artifact.sha256.ToLowerInvariant() -or $actual -ne $declared) { throw 'Release checksum verification failed.' }
+    $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $archive
+    if ($null -eq $hash -or [string]::IsNullOrWhiteSpace([string]$hash.Hash)) { throw 'Unable to calculate the release checksum.' }
+    $actual = ([string]$hash.Hash).ToLowerInvariant()
+    $sidecarText = Get-Content -Raw -LiteralPath $sidecar
+    if ($null -eq $sidecarText -or [string]::IsNullOrWhiteSpace($sidecarText)) { throw 'Release checksum sidecar is empty.' }
+    $sidecarFields = $sidecarText.Trim() -split '\s+'
+    if ($sidecarFields.Count -lt 1 -or $sidecarFields[0] -notmatch '^[0-9a-fA-F]{64}$') { throw 'Release checksum sidecar is invalid.' }
+    $declared = ([string]$sidecarFields[0]).ToLowerInvariant()
+    if ($actual -ne $manifestSha.ToLowerInvariant() -or $actual -ne $declared) { throw 'Release checksum verification failed.' }
 
     $extract = Join-Path $temp 'extract'
     Expand-Archive -LiteralPath $archive -DestinationPath $extract
@@ -90,7 +100,6 @@ try {
         }
         throw
     }
-    Move-Item -LiteralPath $versionDir -Destination $current
     $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $pathEntries = @($machinePath -split ';' | Where-Object { $_ })
     if ($pathEntries -notcontains $current) { [Environment]::SetEnvironmentVariable('Path', (($pathEntries + $current) -join ';'), 'Machine') }

@@ -18,7 +18,7 @@
 
 | 接入形态 | 用户界面在哪里 | Agent 与工具在哪里执行 | 当前责任边界 |
 | --- | --- | --- | --- |
-| 本地 CLI | 执行端的命令行 | 同机 Rivo runtime | 本仓库已有实现；发布目标为 Windows amd64、Linux amd64/arm64、macOS amd64/arm64，系统专属工具另有限制。 |
+| 本地 CLI | 执行端的命令行 | 同机 Rivo runtime | 本仓库已有实现；发布目标为 Windows amd64、Linux amd64/arm64、macOS amd64/arm64；Linux 构件以 Debian 12（glibc 2.36）为最低支持基线并需要 D-Bus，系统专属工具另有限制。 |
 | 本地 TUI | 执行端的终端交互界面 | 同机 Rivo runtime | 本仓库已有实现，与 CLI 共用内核。 |
 | 本地 Desktop | 图形桌面客户端 | 通过本机宿主连接 Rivo runtime | Desktop 由独立仓库负责；本页只核验中立 app-server 接口，不声明 Desktop UI 已支持矩阵中的功能。 |
 | 远程 Web | 用户浏览器 | 宿主所在执行端的 Rivo runtime | 当前仅有可供宿主复用的本机接口；本仓库没有因此交付完整远程 Web 客户端/接入服务。 |

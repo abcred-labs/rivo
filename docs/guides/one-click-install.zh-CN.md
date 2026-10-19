@@ -52,7 +52,7 @@ $env:PATH = "$PWD;$env:PATH"
 .\rivo.exe --version
 ```
 
-计算值必须与 sidecar 第一列相同。归档未签名；SHA-256 只验证完整性，不证明发布者身份。请保持解压目录完整，其中包含 LICENSE、第三方声明、中英文语言资源和 mock provider 示例。Linux 归档需要 glibc 与 `libdbus-1.so.3`，不是 musl/Alpine 构件。
+计算值必须与 sidecar 第一列相同。归档未签名；SHA-256 只验证完整性，不证明发布者身份。请保持解压目录完整，其中包含 LICENSE、第三方声明、中英文语言资源和 mock provider 示例。Linux 归档支持 Debian 12（glibc 2.36）及更新的兼容 GNU/glibc 系统，并需要 `libdbus-1.so.3`，不是 musl/Alpine 构件。
 
 需要复制命令时可运行：
 

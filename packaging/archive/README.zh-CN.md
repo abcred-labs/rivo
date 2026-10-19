@@ -23,7 +23,7 @@ export PATH="$PWD:$PATH"
 ./rivo --version
 ```
 
-macOS 使用 `shasum -a 256 -c`。Linux 需要 glibc 与 `libdbus-1.so.3`，不是 musl/Alpine 目标。归档未签名，摘要只验证完整性。
+macOS 使用 `shasum -a 256 -c`。Linux 归档支持 Debian 12（glibc 2.36）及更新的兼容 GNU/glibc 系统，需要 `libdbus-1.so.3`，不是 musl/Alpine 目标。归档未签名，摘要只验证完整性。
 
 ## 本机 Mock Provider
 

@@ -20,6 +20,9 @@ def main() -> int:
     assert "Expand-Archive" in powershell and "Get-FileHash" in powershell
     assert "ProgramFiles" in powershell and "SetEnvironmentVariable('Path'" in powershell
     assert "rivo.exe" in powershell and "release-manifest" in powershell
+    assert powershell.count("Move-Item -LiteralPath $versionDir -Destination $current") == 1
+    assert "Release manifest must contain exactly one artifact." in powershell
+    assert "Release checksum sidecar is empty." in powershell
     assert "print-install-commands" not in shell
 
     with tempfile.TemporaryDirectory(prefix="rivo-release-notes-") as directory:

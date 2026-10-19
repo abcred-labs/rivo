@@ -28,14 +28,14 @@ The workflow also runs Rust 1.88 MSRV, dependency/license, Linux, Windows and ma
 | Target | Runner | Archive |
 | --- | --- | --- |
 | Windows amd64 | `windows-2025` | ZIP |
-| Linux amd64 | `ubuntu-24.04` | tar.gz |
-| Linux arm64 | `ubuntu-24.04-arm` | tar.gz |
+| Linux amd64 | `ubuntu-22.04` | tar.gz |
+| Linux arm64 | `ubuntu-22.04-arm` | tar.gz |
 | macOS amd64 | `macos-15-intel` | tar.gz |
 | macOS arm64 | `macos-15` | tar.gz |
 
-Each runner builds the release binary, runs `scripts/package.py`, creates the platform manifest and runs `scripts/release_smoke.py`. Smoke checks cover archive checksum, manifest, binary version, English/Chinese help, schema 6 empty configuration, language files, dependency notices, loopback mock Provider and upgrade manifest handling. Windows additionally checks the browser-extension host.
+Each runner builds the release binary, runs the Linux ABI check where applicable, runs `scripts/package.py`, creates the platform manifest and runs `scripts/release_smoke.py`. Linux binaries also run a Debian 12 container smoke before packaging. Archive smoke checks cover archive checksum, manifest, binary version, English/Chinese help, schema 6 empty configuration, language files, dependency notices, loopback mock Provider and upgrade manifest handling. Windows additionally checks the browser-extension host.
 
-Release smoke does not prove every terminal emulator, real model service, real browser, or cross-node A2A deployment. Linux archives require glibc and `libdbus-1.so.3`; archives are unsigned.
+Release smoke does not prove every terminal emulator, real model service, real browser, or cross-node A2A deployment. Linux archives target GNU/glibc and require `libdbus-1.so.3`. They are built on Ubuntu 22.04 and smoke-tested in Debian 12, whose glibc 2.36 runtime is the minimum supported Linux baseline. Archives are unsigned.
 
 ## Draft and publish sequence
 

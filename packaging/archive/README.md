@@ -23,7 +23,7 @@ export PATH="$PWD:$PATH"
 ./rivo --version
 ```
 
-Use `shasum -a 256 -c` on macOS. Linux requires glibc and `libdbus-1.so.3`; musl/Alpine is not a supported archive target. Archives are unsigned; the checksum verifies integrity only.
+Use `shasum -a 256 -c` on macOS. Linux archives support Debian 12 (glibc 2.36) and newer compatible GNU/glibc systems, and require `libdbus-1.so.3`; musl/Alpine is not a supported archive target. Archives are unsigned; the checksum verifies integrity only.
 
 Keep the extracted directory intact. It contains the binary, license files, language
 resources and `share/rivo/examples/mock_provider.py`. Windows additionally includes
