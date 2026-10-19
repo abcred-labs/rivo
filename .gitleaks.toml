@@ -15,3 +15,13 @@ condition = "AND"
 paths = ['^runtime/crates/xtask/src/main\.rs$']
 regexTarget = "secret"
 regexes = ['^abcd1234567890wxyz$', '^test\-key\-123456$']
+
+[[allowlists]]
+description = "Deterministic public-key hashes in A2A protocol fixtures"
+condition = "AND"
+paths = ['^runtime/crates/a2a/protocol/v1\.0\.1/fixtures/(sas-vector|pairing-response\.valid)\.json$']
+regexTarget = "secret"
+regexes = [
+  '^0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef$',
+  '^abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789$',
+]
