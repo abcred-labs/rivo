@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generator": "cargo-about 0.9.2",
-  "cargo_lock_sha256": "a2d7053db8fc844ec4f82eaf82300e6c28a91fb1d6e11fd9f55db20c884c19a4",
+  "cargo_lock_sha256": "18f610d308780cdc268c61aa16de8ada8835ed10a33cd7ff68fd3384c6e875b8",
   "targets": [
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",
@@ -2857,14 +2857,14 @@
     },
     {
       "name": "rustls-webpki",
-      "version": "0.103.15",
+      "version": "0.103.16",
       "license_expression": "ISC",
       "selected_licenses": [
         "ISC"
       ],
       "authors": [],
       "repository": "https://github.com/rustls/webpki",
-      "source": "https://crates.io/api/v1/crates/rustls-webpki/0.103.15/download"
+      "source": "https://crates.io/api/v1/crates/rustls-webpki/0.103.16/download"
     },
     {
       "name": "rustversion",
@@ -4037,14 +4037,14 @@
     },
     {
       "name": "webpki-roots",
-      "version": "1.0.8",
+      "version": "1.0.10",
       "license_expression": "CDLA-Permissive-2.0",
       "selected_licenses": [
         "CDLA-Permissive-2.0"
       ],
       "authors": [],
       "repository": "https://github.com/rustls/webpki-roots",
-      "source": "https://crates.io/api/v1/crates/webpki-roots/1.0.8/download"
+      "source": "https://crates.io/api/v1/crates/webpki-roots/1.0.10/download"
     },
     {
       "name": "winapi",
