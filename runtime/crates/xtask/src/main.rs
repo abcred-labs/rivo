@@ -596,7 +596,7 @@ fn toml_string_at<'a>(value: &'a toml::Value, path: &str) -> Option<&'a str> {
 
 fn sha256_file(path: &Path) -> Option<String> {
     let bytes = std::fs::read(path).ok()?;
-    Some(format!("{:x}", Sha256::digest(bytes)))
+    Some(sha256_hex(Sha256::digest(bytes).as_slice()))
 }
 
 fn validate_a2a_fixture(name: &str, value: &serde_json::Value) -> Result<(), String> {
@@ -841,7 +841,7 @@ fn verify_sas_vector(directory: &Path) -> Result<(), String> {
     input.extend_from_slice(&client_public);
     let digest = Sha256::digest(input);
     let expected_digest = bounded_string(object, "sha256", 64, 64)?;
-    if format!("{digest:x}") != expected_digest {
+    if sha256_hex(digest.as_slice()) != expected_digest {
         return Err("SHA-256 不匹配".into());
     }
     let wordlist = std::fs::read_to_string(directory.join("bip39-english.txt"))
@@ -896,7 +896,7 @@ fn verify_claim_proof_vector_fixture(directory: &Path, fixture_name: &str) -> Re
     input.extend_from_slice(request_id.as_bytes());
     input.extend_from_slice(&token);
     let digest = Sha256::digest(input);
-    if format!("{digest:x}") != bounded_string(object, "sha256", 64, 64)? {
+    if sha256_hex(digest.as_slice()) != bounded_string(object, "sha256", 64, 64)? {
         return Err("claim proof prehash 不匹配".into());
     }
     let spki = base64::engine::general_purpose::URL_SAFE_NO_PAD
@@ -954,6 +954,17 @@ fn output(program: &str, args: &[&str], cwd: &Path) -> Option<Output> {
         .current_dir(cwd)
         .output()
         .ok()
+}
+
+/// Lowercase hex of a SHA-256 digest; sha2 0.11 digests no longer implement `LowerHex`.
+fn sha256_hex(digest: &[u8]) -> String {
+    use std::fmt::Write;
+    digest
+        .iter()
+        .fold(String::with_capacity(64), |mut out, byte| {
+            let _ = write!(out, "{byte:02x}");
+            out
+        })
 }
 
 fn run_check(root: &Path, repo: &Path) -> bool {

@@ -191,7 +191,7 @@ pub fn proof(
     nonce: &[u8; 32],
     ephemeral_key: &[u8],
 ) -> [u8; 32] {
-    let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(secret).expect("fixed key size");
+    let mut mac = <Hmac<Sha256> as hmac::KeyInit>::new_from_slice(secret).expect("fixed key size");
     mac.update(PSK_PROTOCOL_VERSION.as_bytes());
     mac.update(&[0]);
     mac.update(role.as_bytes());
@@ -297,7 +297,7 @@ pub fn derive_session_request_key(session_key: &[u8; 32], request_id: &str) -> Z
 /// It is keyed by the request session key, so a response cannot be forged by
 /// an intermediary even when TLS is terminated elsewhere.
 pub fn server_response_proof(key: &[u8; 32], aad: &str) -> [u8; 32] {
-    let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(key).expect("fixed key size");
+    let mut mac = <Hmac<Sha256> as hmac::KeyInit>::new_from_slice(key).expect("fixed key size");
     mac.update(b"rivo-a2a-psk-server-response-v1");
     mac.update(&[0]);
     mac.update(aad.as_bytes());

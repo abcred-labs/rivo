@@ -619,7 +619,6 @@ fn atomic_write(path: &Path, bytes: &[u8], replace: bool) -> Result<(), LocalLan
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sha2::{Digest, Sha256};
 
     fn custom(locale: &str, message: &str) -> String {
         format!(
@@ -629,9 +628,9 @@ mod tests {
 
     fn remote_package(bytes: Vec<u8>) -> (RemoteLanguagePackage, RemoteLanguageReceipt) {
         let manifest = format!(
-            r#"{{"schema":1,"languages":[{{"locale":"fr-FR","display_name":"Test fr-FR","revision":"test.1","download_url":"https://languages.example/fr-FR.ftl?token=secret","bytes":{},"sha256":"{:x}"}}]}}"#,
+            r#"{{"schema":1,"languages":[{{"locale":"fr-FR","display_name":"Test fr-FR","revision":"test.1","download_url":"https://languages.example/fr-FR.ftl?token=secret","bytes":{},"sha256":"{}"}}]}}"#,
             bytes.len(),
-            Sha256::digest(&bytes)
+            crate::remote::sha256_hex(&bytes)
         );
         let registry = crate::RemoteLanguageRegistry::parse(manifest.as_bytes()).unwrap();
         let entry = registry.entries()[0].clone();

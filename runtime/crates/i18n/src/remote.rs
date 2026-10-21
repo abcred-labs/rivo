@@ -275,7 +275,7 @@ impl RemoteLanguagePackage {
                 actual: bytes.len(),
             });
         }
-        let actual_sha256 = format!("{:x}", Sha256::digest(&bytes));
+        let actual_sha256 = sha256_hex(&bytes);
         if actual_sha256 != entry.sha256 {
             return Err(RemoteLanguageError::Sha256Mismatch {
                 expected: entry.sha256,
@@ -409,6 +409,17 @@ fn validate_short_text(
     }
 }
 
+/// Lowercase hex SHA-256; sha2 0.11 digests no longer implement `LowerHex`.
+pub(crate) fn sha256_hex(bytes: &[u8]) -> String {
+    use std::fmt::Write;
+    Sha256::digest(bytes)
+        .iter()
+        .fold(String::with_capacity(64), |mut out, byte| {
+            let _ = write!(out, "{byte:02x}");
+            out
+        })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -425,9 +436,9 @@ mod tests {
 
     fn registry(file: &[u8], url: &str) -> Vec<u8> {
         format!(
-            r#"{{"schema":1,"languages":[{{"locale":"fr-FR","display_name":"Francais","revision":"test.1","download_url":"{url}","bytes":{},"sha256":"{:x}"}}]}}"#,
+            r#"{{"schema":1,"languages":[{{"locale":"fr-FR","display_name":"Francais","revision":"test.1","download_url":"{url}","bytes":{},"sha256":"{}"}}]}}"#,
             file.len(),
-            Sha256::digest(file)
+            sha256_hex(file)
         )
         .into_bytes()
     }
