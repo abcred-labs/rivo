@@ -91,6 +91,9 @@ if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
     $mirror = $false
 } else {
     $BaseUrl = $BaseUrl.TrimEnd('/')
+    if ($BaseUrl -notmatch '^https://' -and $BaseUrl -notmatch '^http://(127\.0\.0\.1|localhost|\[::1\])([:/]|$)') {
+        throw '-BaseUrl must be an https:// URL (http is only allowed for loopback).'
+    }
     $manifestUrl = "$BaseUrl/windows-amd64/release-manifest.json"
     $mirror = $true
 }
@@ -129,6 +132,14 @@ try {
     if ($actual -ne $manifestSha.ToLowerInvariant() -or $actual -ne $declared) { throw 'Release checksum verification failed.' }
 
     $extract = Join-Path $temp 'extract'
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [IO.Compression.ZipFile]::OpenRead($archive)
+    try {
+        foreach ($entry in $zip.Entries) {
+            $name = $entry.FullName
+            if ($name.StartsWith('/') -or $name.StartsWith('\') -or $name -match '(^|[\/])\.\.([\/]|$)' -or $name -match '^[A-Za-z]:') { throw 'Archive contains an unsafe path.' }
+        }
+    } finally { $zip.Dispose() }
     Expand-Archive -LiteralPath $archive -DestinationPath $extract
     $payload = Join-Path $extract ("rivo-$($manifest.version)-windows-amd64")
     if (-not (Test-Path -LiteralPath (Join-Path $payload 'rivo.exe'))) { throw 'Archive does not contain rivo.exe.' }

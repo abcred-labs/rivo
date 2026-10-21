@@ -23,6 +23,9 @@ jobs:
     outputs:
       version: ${{ steps.release.outputs.version }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - name: Validate candidate version
         id: release
         env:
@@ -32,6 +35,24 @@ jobs:
           version="${INPUT_VERSION:-${GITHUB_REF_NAME#v}}"
           if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Expected major.minor.patch; got $version" >&2
+            exit 1
+          fi
+          cargo_version=$(grep -m1 '^version = ' runtime/Cargo.toml | cut -d'"' -f2)
+          if [[ "$cargo_version" != "$version" ]]; then
+            echo "runtime/Cargo.toml version $cargo_version does not match release $version" >&2
+            exit 1
+          fi
+          if ! grep -q "^## ${version}（" CHANGELOG.md; then
+            echo "CHANGELOG.md has no entry for $version" >&2
+            exit 1
+          fi
+          if ! grep -q "^## ${version} (English)" CHANGELOG.en.md; then
+            echo "CHANGELOG.en.md has no entry for $version" >&2
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD; then
+            echo "Release commit is not on main" >&2
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -65,6 +86,10 @@ jobs:
   package:
     name: Package ${{ matrix.platform }}-${{ matrix.arch }}
     needs: [version, verify]
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -131,6 +156,17 @@ jobs:
           python scripts/package.py --binary "${{ matrix.binary }}" --version "$VERSION" --platform "${{ matrix.platform }}" --arch "${{ matrix.arch }}" --commit "$GITHUB_SHA" --out artifacts/release
           python scripts/release_manifest.py --directory artifacts/release --version "$VERSION" --platform "${{ matrix.platform }}" --arch "${{ matrix.arch }}" --commit "$GITHUB_SHA"
           python scripts/release_smoke.py --directory artifacts/release --version "$VERSION" --platform "${{ matrix.platform }}" --arch "${{ matrix.arch }}" --report "artifacts/release/smoke-${{ matrix.platform }}-${{ matrix.arch }}.json"
+      - name: Generate SBOM
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        shell: bash
+        run: python scripts/generate_sbom.py --version "$VERSION" --commit "$GITHUB_SHA" --output "artifacts/release/rivo-$VERSION-${{ matrix.platform }}-${{ matrix.arch }}.sbom.cdx.json"
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            artifacts/release/*.zip
+            artifacts/release/*.tar.gz
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-${{ matrix.platform }}-${{ matrix.arch }}

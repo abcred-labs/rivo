@@ -91,6 +91,10 @@ if [ -z "$BASE_URL" ]; then
     MIRROR=0
 else
     BASE_URL="${BASE_URL%/}"
+    case "$BASE_URL" in
+        https://*|http://127.0.0.1|http://127.0.0.1[:/]*|http://localhost|http://localhost[:/]*|"http://[::1]"|"http://[::1]"[:/]*) ;;
+        *) echo "--base-url must be an https:// URL (http is only allowed for loopback)" >&2; exit 1 ;;
+    esac
     MANIFEST_URL="$BASE_URL/$PLATFORM-$ARCH/release-manifest.json"
     MIRROR=1
 fi
@@ -208,10 +212,16 @@ fi
 mkdir -p "$INSTALL_ROOT/versions" "$(dirname "$INSTALL_ROOT")" "$BIN_DIR"
 
 VERSION_DIR="$INSTALL_ROOT/versions/$MANIFEST_VERSION"
+OLD_DIR=""
 if [ -e "$VERSION_DIR" ]; then
-    rm -rf "$VERSION_DIR"
+    OLD_DIR="$VERSION_DIR.old.$$"
+    mv "$VERSION_DIR" "$OLD_DIR"
 fi
-mv "$PAYLOAD" "$VERSION_DIR"
+if ! mv "$PAYLOAD" "$VERSION_DIR"; then
+    [ -z "$OLD_DIR" ] || mv "$OLD_DIR" "$VERSION_DIR"
+    echo "failed to place the new version" >&2
+    exit 1
+fi
 
 if [ -L "$INSTALL_ROOT/current" ]; then
     OLD_TARGET=$(readlink "$INSTALL_ROOT/current")
@@ -222,6 +232,8 @@ ln -sfn "versions/$MANIFEST_VERSION" "$INSTALL_ROOT/current.new"
 mv -f "$INSTALL_ROOT/current.new" "$INSTALL_ROOT/current"
 ln -sfn "$INSTALL_ROOT/current/rivo" "$BIN_DIR/rivo.new"
 mv -f "$BIN_DIR/rivo.new" "$BIN_DIR/rivo"
+
+[ -z "$OLD_DIR" ] || rm -rf "$OLD_DIR"
 
 echo "installed Rivo $MANIFEST_VERSION ($PLATFORM/$ARCH)"
 echo "run: rivo --version"

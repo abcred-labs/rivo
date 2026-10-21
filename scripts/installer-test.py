@@ -28,6 +28,8 @@ def main() -> int:
         assert "RIVO_GITHUB_MIRROR" in text and "RIVO_RELEASE_ASSETS_MIRROR" in text
         assert "release-assets.githubusercontent.com" in text
     assert "--no-same-owner" in shell and "unsafe path" in shell
+    assert "must be an https:// URL (http is only allowed for loopback)" in shell
+    assert "http is only allowed for loopback" in powershell
     assert "AllowAutoRedirect = $false" in powershell and "Invoke-WebRequest" not in powershell
 
     with tempfile.TemporaryDirectory(prefix="rivo-release-notes-") as directory:

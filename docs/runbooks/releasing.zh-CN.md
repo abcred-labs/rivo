@@ -4,7 +4,7 @@
 
 ## 1. 发布前质量门
 
-从仓库根目录执行；Rust 工具链由 `rust-toolchain.toml` 固定，Python 需要 3.11+，扩展测试使用 Node.js 22。`xtask check` 的最低版本检查还需要 `rustup toolchain install 1.88.0 --profile minimal`。
+从仓库根目录执行；Rust 工具链由 `rust-toolchain.toml` 固定，Python 需要 3.11+，扩展测试使用 Node.js 22。`xtask check` 是本地一站式门禁，CI 逐步执行等价检查；其最低版本检查还需要 `rustup toolchain install 1.88.0 --profile minimal`。
 
 ```text
 cd runtime
@@ -31,7 +31,7 @@ python scripts/generate_licenses.py --check
 | macOS amd64 | macos-15-intel | tar.gz |
 | macOS arm64 | macos-15 | tar.gz |
 
-Release 在各 runner 构建 release 二进制；Linux 另外执行 glibc ABI 检查和 Debian 12 容器 smoke；随后打包并执行 `scripts/release_smoke.py`。该检查解压归档，在隔离配置、数据目录和工作区中验证：
+Release 在各 runner 构建 release 二进制；Linux 另外执行 glibc ABI 检查和 Debian 12 容器 smoke；随后打包并执行 `scripts/release_smoke.py`。随后为每个归档生成 CycloneDX SBOM 和 GitHub 构建来源 attestation，可用 `gh attestation verify <归档> --repo abcred-labs/rivo` 验证。该检查解压归档，在隔离配置、数据目录和工作区中验证：
 
 - SHA-256、manifest 平台/版本/大小与实际二进制版本。
 - 中英文帮助、schema 6 空配置、两份打包 FTL 与完整第三方声明。
@@ -45,7 +45,7 @@ Windows 系统集成面向 Windows 11 x64。Linux/macOS 提供通用 CLI/TUI，�
 
 ## 3. 门禁通过后发布
 
-1. 更新 [CHANGELOG](../../CHANGELOG.md) 的功能、兼容性及已知限制，完成源码和依赖门禁，提交并同步到目标仓库。
+1. 更新 [CHANGELOG](../../CHANGELOG.md) 与 `CHANGELOG.en.md`（缺少任一条目、tag 与 `runtime/Cargo.toml` 版本不一致或提交不在 `main` 上时，workflow 会拒绝发布）的功能、兼容性及已知限制，完成源码和依赖门禁，提交并同步到目标仓库。
 2. 在 Actions 的 Release workflow 使用 `workflow_dispatch`，输入 `major.minor.patch` 生成候选；或推送相应 `v<version>` tag。两条路径都会先运行完整门禁和五目标构建矩阵，全部通过后才发布为 latest；任一作业失败则不发布任何内容。
 3. 检查五个目标的构件、checksum、manifest 和 smoke 报告，确认其 commit 一致；核对下载说明与限制。相同版本不允许替换已公开的构件，修复须递增版本。
 4. 在 GitHub 上核验私密漏洞报告、Secret scanning/push protection、Dependabot，以及主分支和版本 tag 保护。私密报告入口须与 [SECURITY](../../SECURITY.md) 一致。

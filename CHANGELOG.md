@@ -1,5 +1,21 @@
 # Changelog
 
+英文摘要见 [CHANGELOG.en.md](CHANGELOG.en.md)，Release 说明会附带对应版本的英文条目。
+
+## 0.2.11（2026-10-21）
+
+### 升级与安装加固
+
+- `rivo upgrade` 要求 `RIVO_RELEASE_BASE_URL` 使用 `https://`（仅回环地址允许 `http://`）；下载流式写盘并限制 512 MiB，manifest 与校验和响应限制 1 MiB。
+- ZIP/tar 解包拒绝符号链接，限制条目数（10,000）和解包总大小（2 GiB）。Unix 安装脚本、PowerShell 安装脚本与 `rivo upgrade` 在安装前校验归档成员路径，替换已有版本目录时先挪开再换入，失败可回滚，不再先删除。
+- `rivo-install.sh` / `rivo-install.ps1` 的 `--base-url` / `-BaseUrl` 同样要求 https（回环除外）。
+
+### 发布供应链
+
+- 每个归档新增 CycloneDX SBOM（`rivo-<version>-<platform>-<arch>.sbom.cdx.json`）和 GitHub 构建来源 attestation，可用 `gh attestation verify <归档> --repo abcred-labs/rivo` 验证。归档仍未做平台代码签名。
+- Release workflow 增加守卫：tag 版本必须与 `runtime/Cargo.toml` 一致，`CHANGELOG.md` 与 `CHANGELOG.en.md` 必须有对应条目，提交必须位于 `main`。
+- CI 合并了重复的测试步骤；Release 说明附带英文条目。
+
 ## 0.2.10（2026-10-21）
 
 ### 安装与升级

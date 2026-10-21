@@ -78,11 +78,6 @@ jobs:
         if: runner.os == 'Linux'
         run: python scripts/check-linux-abi.py runtime/target/debug/rivo --max-glibc 2.36
       - name: Test
-        if: runner.os != 'Windows'
-        working-directory: runtime
-        run: cargo test --workspace --all-targets --locked --exclude rivo --exclude rivo-tools
-      - name: Test (Windows workspace)
-        if: runner.os == 'Windows'
         working-directory: runtime
         run: cargo test --workspace --all-targets --locked --exclude rivo --exclude rivo-tools
       - name: Test (CLI unit)

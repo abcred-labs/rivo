@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 
@@ -18,7 +19,17 @@ def main() -> int:
     release = f"https://github.com/{repository}/releases/download/v{version}"
     latest = f"https://github.com/{repository}/releases/latest/download"
     raw = f"https://raw.githubusercontent.com/{repository}/v{version}"
-    lines = [args.changelog.read_text(encoding="utf-8").rstrip(), "", "## Install Rivo", ""]
+    english = args.changelog.with_name("CHANGELOG.en.md")
+    lines = [args.changelog.read_text(encoding="utf-8").rstrip(), ""]
+    if english.is_file():
+        match = re.search(
+            rf"^## {re.escape(version)} \(English\)\n.*?(?=^## |\Z)",
+            english.read_text(encoding="utf-8"),
+            re.S | re.M,
+        )
+        if match:
+            lines.extend(["---", "", match.group(0).rstrip().replace(" (English)", " (English summary)", 1), ""])
+    lines.extend(["## Install Rivo", ""])
     lines.extend(
         [
             "The release assets are unsigned. Verify the SHA-256 sidecar before running an archive.",

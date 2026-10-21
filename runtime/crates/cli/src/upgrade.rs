@@ -16,6 +16,10 @@ const DEFAULT_RELEASE_DOWNLOAD_ROOT: &str = "https://github.com/abcred-labs/rivo
 const GITHUB_ORIGIN: &str = "https://github.com";
 const RELEASE_ASSETS_ORIGIN: &str = "https://release-assets.githubusercontent.com";
 const MAX_REDIRECTS: usize = 5;
+const MAX_ARCHIVE_BYTES: u64 = 512 * 1024 * 1024;
+const MAX_TEXT_BYTES: usize = 1024 * 1024;
+const MAX_ARCHIVE_ENTRIES: usize = 10_000;
+const MAX_UNPACKED_BYTES: u64 = 2 * 1024 * 1024 * 1024;
 
 /// Optional download mirrors for networks with slow or blocked GitHub access.
 /// Only the transport is redirected: the manifest, artifact names and SHA-256
@@ -181,6 +185,9 @@ pub async fn run(apply: bool, yes: bool) -> anyhow::Result<()> {
         .as_deref()
         .unwrap_or(DEFAULT_RELEASE_BASE_URL)
         .trim_end_matches('/');
+    if configured.is_some() {
+        validate_base_url(base)?;
+    }
     let source = release_source(base, configured.is_none(), target);
     let client = Client::builder()
         .user_agent(format!("rivo/{current}"))
@@ -248,6 +255,23 @@ pub async fn run(apply: bool, yes: bool) -> anyhow::Result<()> {
             Ok(())
         }
         Ordering::Less => apply_update(&http, &source, &manifest, target, yes).await,
+    }
+}
+
+/// A custom release base must use HTTPS; plain HTTP is only accepted for loopback
+/// hosts so local mirrors and tests keep working.
+fn validate_base_url(base: &str) -> anyhow::Result<()> {
+    let url = reqwest::Url::parse(base).context("RIVO_RELEASE_BASE_URL is not a valid URL")?;
+    let loopback = matches!(
+        url.host_str(),
+        Some("localhost" | "127.0.0.1" | "[::1]" | "::1")
+    );
+    match url.scheme() {
+        "https" => Ok(()),
+        "http" if loopback => Ok(()),
+        _ => bail!(
+            "RIVO_RELEASE_BASE_URL must be an https:// URL (http is only allowed for loopback)"
+        ),
     }
 }
 
@@ -346,15 +370,40 @@ async fn download_to(http: &Http, url: &str, path: &Path) -> anyhow::Result<()> 
     if !response.status().is_success() {
         bail!("HTTP {} from {url}", response.status());
     }
-    fs::write(
-        path,
-        response
-            .bytes()
-            .await
-            .context("failed to read release archive")?,
-    )
-    .with_context(|| format!("cannot write {}", path.display()))?;
+    if response
+        .content_length()
+        .is_some_and(|length| length > MAX_ARCHIVE_BYTES)
+    {
+        bail!("release archive exceeds the {MAX_ARCHIVE_BYTES} byte limit");
+    }
+    let mut response = response;
+    let mut file =
+        File::create(path).with_context(|| format!("cannot write {}", path.display()))?;
+    let mut written = 0_u64;
+    while let Some(chunk) = response
+        .chunk()
+        .await
+        .context("failed to read release archive")?
+    {
+        written += chunk.len() as u64;
+        if written > MAX_ARCHIVE_BYTES {
+            bail!("release archive exceeds the {MAX_ARCHIVE_BYTES} byte limit");
+        }
+        file.write_all(&chunk)
+            .with_context(|| format!("cannot write {}", path.display()))?;
+    }
     Ok(())
+}
+
+async fn read_limited(mut response: reqwest::Response) -> anyhow::Result<Vec<u8>> {
+    let mut body = Vec::new();
+    while let Some(chunk) = response.chunk().await? {
+        if body.len() + chunk.len() > MAX_TEXT_BYTES {
+            bail!("HTTP response exceeds the {MAX_TEXT_BYTES} byte limit");
+        }
+        body.extend_from_slice(&chunk);
+    }
+    Ok(body)
 }
 
 async fn verify_archive(
@@ -398,7 +447,7 @@ async fn fetch_text(http: &Http, url: &str) -> anyhow::Result<String> {
     if !response.status().is_success() {
         bail!("HTTP {} from {url}", response.status());
     }
-    Ok(response.text().await?)
+    String::from_utf8(read_limited(response).await?).context("response is not UTF-8")
 }
 
 async fn fetch_json<T: for<'de> Deserialize<'de>>(http: &Http, url: &str) -> anyhow::Result<T> {
@@ -409,7 +458,8 @@ async fn fetch_json<T: for<'de> Deserialize<'de>>(http: &Http, url: &str) -> any
     if !response.status().is_success() {
         bail!("HTTP {} from {url}", response.status());
     }
-    response.json().await.context(ui::text(
+    let body = read_limited(response).await?;
+    serde_json::from_slice(&body).context(ui::text(
         "cli-upgrade-json-parse-failed",
         "Failed to parse the JSON response",
     ))
@@ -520,8 +570,22 @@ fn extract_archive(archive: &Path, destination: &Path, target: Target) -> anyhow
     if target.platform == "windows" {
         let mut zip =
             zip::ZipArchive::new(File::open(archive)?).context("cannot read ZIP archive")?;
+        if zip.len() > MAX_ARCHIVE_ENTRIES {
+            bail!("archive contains too many entries");
+        }
+        let mut unpacked = 0_u64;
         for index in 0..zip.len() {
             let mut entry = zip.by_index(index)?;
+            if entry
+                .unix_mode()
+                .is_some_and(|mode| mode & 0o170000 == 0o120000)
+            {
+                bail!("archive contains a symbolic link");
+            }
+            unpacked = unpacked.saturating_add(entry.size());
+            if unpacked > MAX_UNPACKED_BYTES {
+                bail!("archive expands beyond the size limit");
+            }
             let entry_name = entry.name()?;
             let name = Path::new(entry_name.as_ref());
             if !safe_archive_path(name) {
@@ -534,14 +598,22 @@ fn extract_archive(archive: &Path, destination: &Path, target: Target) -> anyhow
                 if let Some(parent) = output.parent() {
                     fs::create_dir_all(parent)?;
                 }
-                io::copy(&mut entry, &mut File::create(output)?)?;
+                let limit = MAX_UNPACKED_BYTES;
+                io::copy(&mut (&mut entry).take(limit), &mut File::create(output)?)?;
             }
         }
     } else {
         let decoder = flate2::read::GzDecoder::new(File::open(archive)?);
         let mut tar = tar::Archive::new(decoder);
+        let mut count = 0_usize;
+        let mut unpacked = 0_u64;
         for entry in tar.entries()? {
             let mut entry = entry?;
+            count += 1;
+            unpacked = unpacked.saturating_add(entry.header().size().unwrap_or(0));
+            if count > MAX_ARCHIVE_ENTRIES || unpacked > MAX_UNPACKED_BYTES {
+                bail!("archive exceeds the entry or size limit");
+            }
             let path = entry.path()?.into_owned();
             if !safe_archive_path(&path)
                 || (!entry.header().entry_type().is_file() && !entry.header().entry_type().is_dir())
@@ -564,10 +636,20 @@ fn install_unix(root: &Path, payload: &Path, version: &str) -> anyhow::Result<()
     let versions = root.join("versions");
     fs::create_dir_all(&versions)?;
     let version_dir = versions.join(version);
-    if version_dir.exists() {
-        fs::remove_dir_all(&version_dir)?;
+    let displaced = versions.join(format!("{version}.old.{}", std::process::id()));
+    let had_existing = version_dir.exists();
+    if had_existing {
+        fs::rename(&version_dir, &displaced)?;
     }
-    fs::rename(payload, &version_dir)?;
+    if let Err(error) = fs::rename(payload, &version_dir) {
+        if had_existing {
+            let _ = fs::rename(&displaced, &version_dir);
+        }
+        return Err(error.into());
+    }
+    if had_existing {
+        let _ = fs::remove_dir_all(&displaced);
+    }
     let current = root.join("current");
     if current.exists() || current.is_symlink() {
         if let Ok(previous_target) = fs::read_link(&current) {
@@ -805,6 +887,15 @@ mod tests {
             Mirrors::default().rewrite("https://github.com/a"),
             "https://github.com/a"
         );
+    }
+    #[test]
+    fn restricts_custom_release_base_urls() {
+        assert!(validate_base_url("https://mirror.example/rivo").is_ok());
+        assert!(validate_base_url("http://127.0.0.1:8080").is_ok());
+        assert!(validate_base_url("http://localhost:8080").is_ok());
+        assert!(validate_base_url("http://mirror.example").is_err());
+        assert!(validate_base_url("ftp://mirror.example").is_err());
+        assert!(validate_base_url("not a url").is_err());
     }
     #[test]
     fn rejects_non_https_mirrors() {

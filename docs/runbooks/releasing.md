@@ -21,7 +21,7 @@ cargo audit --file runtime/Cargo.lock --deny warnings
 python scripts/generate_licenses.py --check
 ```
 
-The workflow also runs Rust 1.88 MSRV, dependency/license, Linux, Windows and macOS quality jobs. Dependency changes require refreshed `licenses/` output.
+`cargo run -p xtask -- check` is the local one-shot gate; CI runs the equivalent steps individually. The workflow also runs Rust 1.88 MSRV, dependency/license, Linux, Windows and macOS quality jobs. Dependency changes require refreshed `licenses/` output.
 
 ## Archive matrix
 
@@ -33,13 +33,13 @@ The workflow also runs Rust 1.88 MSRV, dependency/license, Linux, Windows and ma
 | macOS amd64 | `macos-15-intel` | tar.gz |
 | macOS arm64 | `macos-15` | tar.gz |
 
-Each runner builds the release binary, runs the Linux ABI check where applicable, runs `scripts/package.py`, creates the platform manifest and runs `scripts/release_smoke.py`. Linux binaries also run a Debian 12 container smoke before packaging. Archive smoke checks cover archive checksum, manifest, binary version, English/Chinese help, schema 6 empty configuration, language files, dependency notices, loopback mock Provider and upgrade manifest handling. Windows additionally checks the browser-extension host.
+Each runner builds the release binary, writes a CycloneDX SBOM and a GitHub build-provenance attestation for the archive (verify with `gh attestation verify <archive> --repo abcred-labs/rivo`), runs the Linux ABI check where applicable, runs `scripts/package.py`, creates the platform manifest and runs `scripts/release_smoke.py`. Linux binaries also run a Debian 12 container smoke before packaging. Archive smoke checks cover archive checksum, manifest, binary version, English/Chinese help, schema 6 empty configuration, language files, dependency notices, loopback mock Provider and upgrade manifest handling. Windows additionally checks the browser-extension host.
 
 Release smoke does not prove every terminal emulator, real model service, real browser, or cross-node A2A deployment. Linux archives target GNU/glibc and require `libdbus-1.so.3`. They are built on Ubuntu 22.04 and smoke-tested in Debian 12, whose glibc 2.36 runtime is the minimum supported Linux baseline. Archives are unsigned.
 
 ## Draft and publish sequence
 
-1. Update `CHANGELOG.md` with behavior, compatibility and known limitations.
+1. Update `CHANGELOG.md` and `CHANGELOG.en.md` (the workflow refuses a version without both entries, a tag that differs from `runtime/Cargo.toml`, or a commit that is not on `main`) with behavior, compatibility and known limitations.
 2. Run the quality gate on the exact commit that will be tagged.
 3. Dispatch the Release workflow with `major.minor.patch`, or push the matching `v<version>` tag. The workflow runs the full gate and the five-target matrix, then publishes the release as latest only if every job passes; a failed job publishes nothing.
 4. Inspect all five archives, sidecars, manifests, smoke reports and commit fields. The workflow refuses replacing a published version.
