@@ -56,4 +56,6 @@ Windows 系统集成面向 Windows 11 x64。Linux/macOS 提供通用 CLI/TUI，�
 
 ---
 
+[稳定版发布计划](stable-release-plan.zh-CN.md)：发版脚本、仓库安全检查、1.0 条件与代码签名。
+
 [English](releasing.md)

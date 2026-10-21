@@ -49,4 +49,6 @@ Release smoke does not prove every terminal emulator, real model service, real b
 
 Versions currently use three numeric components and the manifest channel is `stable`. A 0.x release must state experimental behavior and platform limits; it must not claim production stability.
 
+[Stable release plan](stable-release-plan.md): version bump helper, repository security check, 1.0 criteria and code signing.
+
 [Install guide](../guides/one-click-install.md) | [Chinese version](releasing.zh-CN.md)

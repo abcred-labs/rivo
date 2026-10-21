@@ -50,6 +50,10 @@ jobs:
             echo "CHANGELOG.en.md has no entry for $version" >&2
             exit 1
           fi
+          if grep -q "TODO: fill in" CHANGELOG.md CHANGELOG.en.md; then
+            echo "CHANGELOG still contains a TODO placeholder" >&2
+            exit 1
+          fi
           git fetch --no-tags origin main
           if ! git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD; then
             echo "Release commit is not on main" >&2
