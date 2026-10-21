@@ -2,6 +2,14 @@
 
 Chinese is the primary changelog ([CHANGELOG.md](CHANGELOG.md)); this file mirrors each release for English readers. Release notes on GitHub include the matching entry.
 
+## 0.2.13 (English)
+
+### Dependencies and build
+
+- Updated `base64` (0.23), `x509-parser` (0.18), `sha2` (0.11), `hmac` and `hkdf` (0.13), `serde` and `thiserror`. The A2A pairing-key code uses `hmac::KeyInit` and SHA-256 hex output is encoded explicitly; behavior is unchanged.
+- The release workflow uses `softprops/action-gh-release` v3.0.3 (Node 24 runtime).
+- Added the `scripts/bump_version.py` release helper, the `scripts/check_repo_security.py` repository security check and a stable release plan draft; CI now also checks whitespace, the A2A protocol inputs and the TUI dependency direction.
+
 ## 0.2.12 (English)
 
 ### Installer

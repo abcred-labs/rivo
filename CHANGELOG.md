@@ -2,6 +2,14 @@
 
 英文摘要见 [CHANGELOG.en.md](CHANGELOG.en.md)，Release 说明会附带对应版本的英文条目。
 
+## 0.2.13（2026-10-22）
+
+### 依赖与构建
+
+- 更新 `base64`（0.23）、`x509-parser`（0.18）、`sha2`（0.11）、`hmac` 与 `hkdf`（0.13）、`serde`、`thiserror`。A2A 配对密钥代码改用 `hmac::KeyInit`，SHA-256 十六进制输出改为显式编码，行为不变。
+- 发布工作流升级到 `softprops/action-gh-release` v3.0.3（Node 24 运行时）。
+- 新增 `scripts/bump_version.py` 发版脚本、`scripts/check_repo_security.py` 仓库安全检查，以及稳定版发布计划草案；CI 增加空白字符、A2A 协议和依赖方向检查。
+
 ## 0.2.12（2026-10-21）
 
 ### 安装
