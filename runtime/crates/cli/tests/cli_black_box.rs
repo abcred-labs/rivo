@@ -150,7 +150,7 @@ fn start_loopback_mcp_fixture() -> (String, thread::JoinHandle<()>) {
             let (status, body) = if request.contains("notifications/initialized") {
                 ("202 Accepted", String::new())
             } else if request.contains("tools/list") {
-                ("200 OK", r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"fixture tool","input_schema":{"type":"object"}}]}}"#.into())
+                ("200 OK", r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"fixture tool","inputSchema":{"type":"object"}}]}}"#.into())
             } else if request.contains("resources/list") {
                 ("200 OK", r#"{"jsonrpc":"2.0","id":1,"result":{"resources":[{"uri":"memory://fixture","name":"fixture resource"}]}}"#.into())
             } else if request.contains("prompts/list") {
@@ -1633,7 +1633,7 @@ fn e2e_cli_mcp_inspect_discovers_all_declared_capabilities_over_loopback() {
             } else if request.contains("tools/list") {
                 (
                     "200 OK",
-                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"fixture tool","input_schema":{"type":"object"}}]}}"#.into(),
+                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"fixture tool","inputSchema":{"type":"object"}}]}}"#.into(),
                 )
             } else if request.contains("resources/list") {
                 (

@@ -2627,7 +2627,7 @@ fn curl_body(
                 json!([{"type":"function","name":"echo","parameters":{"type":"object"}}])
             }
             ProviderKind::ClaudeMessages => {
-                json!([{"name":"echo","input_schema":{"type":"object"}}])
+                json!([{"name":"echo","inputSchema":{"type":"object"}}])
             }
         };
         body["tool_choice"] = match target.protocol {
@@ -2656,7 +2656,7 @@ fn curl_body(
         }
         if target.protocol == ProviderKind::ClaudeMessages {
             body.as_object_mut().unwrap().remove("response_format");
-            body["tools"] = json!([{"name":"release_result","input_schema":{"type":"object"}}]);
+            body["tools"] = json!([{"name":"release_result","inputSchema":{"type":"object"}}]);
             body["tool_choice"] = json!({"type":"tool","name":"release_result"});
         }
     }

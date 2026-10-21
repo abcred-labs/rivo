@@ -6054,7 +6054,7 @@ mod tests {
                 let length = stream.read(&mut request).await.unwrap();
                 let request = String::from_utf8_lossy(&request[..length]);
                 let body = if request.contains("tools/list") {
-                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"http echo","input_schema":{"type":"object"}}]}}"#
+                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"http echo","inputSchema":{"type":"object"}}]}}"#
                 } else if request.contains("tools/call") {
                     r#"{"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"http evidence"}]}}"#
                 } else {
@@ -6365,7 +6365,7 @@ mod tests {
                 vec![
                     "-NoProfile".to_owned(),
                     "-Command".to_owned(),
-                    "$input | ForEach-Object { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"input_schema\":{\"type\":\"object\"}}]}}' }".to_owned(),
+                    "$input | ForEach-Object { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"inputSchema\":{\"type\":\"object\"}}]}}' }".to_owned(),
                 ],
             )
         } else {
@@ -6373,7 +6373,7 @@ mod tests {
                 "sh".to_owned(),
                 vec![
                     "-c".to_owned(),
-                    "while IFS= read -r line; do printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"input_schema\":{\"type\":\"object\"}}]}}'; done".to_owned(),
+                    "while IFS= read -r line; do printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"inputSchema\":{\"type\":\"object\"}}]}}'; done".to_owned(),
                 ],
             )
         };

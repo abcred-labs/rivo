@@ -171,6 +171,7 @@ impl McpServerHandler for DecliningServerHandler {}
 pub struct McpToolDescription {
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "inputSchema")]
     pub input_schema: Value,
 }
 
@@ -178,6 +179,7 @@ pub struct McpToolDescription {
 pub struct McpResourceDescription {
     pub uri: String,
     pub name: Option<String>,
+    #[serde(rename = "mimeType")]
     pub mime_type: Option<String>,
 }
 
@@ -1651,7 +1653,7 @@ mod tests {
                 } else if body.contains("tools/list") {
                     (
                         "200 OK",
-                        r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","input_schema":{"type":"object"}}]}}"#,
+                        r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","inputSchema":{"type":"object"}}]}}"#,
                     )
                 } else if body.contains("resources/list") {
                     (
@@ -1703,7 +1705,7 @@ mod tests {
                 vec![
                     "-NoProfile".to_owned(),
                     "-Command".to_owned(),
-                    "$input | ForEach-Object { if ($_ -notlike '*notifications/initialized*') { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"input_schema\":{\"type\":\"object\"}}]}}' } }".to_owned(),
+                    "$input | ForEach-Object { if ($_ -notlike '*notifications/initialized*') { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"inputSchema\":{\"type\":\"object\"}}]}}' } }".to_owned(),
                 ],
             )
         } else {
@@ -1711,7 +1713,7 @@ mod tests {
                 "sh".to_owned(),
                 vec![
                     "-c".to_owned(),
-                    "while IFS= read -r line; do case \"$line\" in *notifications/initialized*) ;; *) printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"input_schema\":{\"type\":\"object\"}}]}}' ;; esac; done".to_owned(),
+                    "while IFS= read -r line; do case \"$line\" in *notifications/initialized*) ;; *) printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"echo\",\"inputSchema\":{\"type\":\"object\"}}]}}' ;; esac; done".to_owned(),
                 ],
             )
         };
@@ -1889,9 +1891,9 @@ mod tests {
                 }
                 let json = if page == 0 {
                     page += 1;
-                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"a","input_schema":{}}],"nextCursor":"p2"}}"#
+                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"a","inputSchema":{}}],"nextCursor":"p2"}}"#
                 } else {
-                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"b","input_schema":{}}]}}"#
+                    r#"{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"b","inputSchema":{}}]}}"#
                 };
                 let response = format!(
                     "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
@@ -1923,7 +1925,7 @@ mod tests {
                 vec![
                     "-NoProfile".to_owned(),
                     "-Command".to_owned(),
-                    "$t=$env:CHILD_TOKEN; $input | ForEach-Object { if ($_ -notlike '*notifications/initialized*') { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"'+$t+'\",\"input_schema\":{}}]}}' } }".to_owned(),
+                    "$t=$env:CHILD_TOKEN; $input | ForEach-Object { if ($_ -notlike '*notifications/initialized*') { '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"'+$t+'\",\"inputSchema\":{}}]}}' } }".to_owned(),
                 ],
             )
         } else {
@@ -1931,7 +1933,7 @@ mod tests {
                 "sh".to_owned(),
                 vec![
                     "-c".to_owned(),
-                    "while IFS= read -r line; do case \"$line\" in *notifications/initialized*) ;; *) printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"%s\",\"input_schema\":{}}]}}\\n' \"$CHILD_TOKEN\" ;; esac; done".to_owned(),
+                    "while IFS= read -r line; do case \"$line\" in *notifications/initialized*) ;; *) printf '{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"%s\",\"inputSchema\":{}}]}}\\n' \"$CHILD_TOKEN\" ;; esac; done".to_owned(),
                 ],
             )
         };
