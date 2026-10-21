@@ -32,7 +32,7 @@ rust-version = "1.88"
 anyhow = "1"
 async-stream = "0.3"
 async-trait = "0.1"
-base64 = "0.22"
+base64 = "0.23"
 p256 = { version = "0.13", features = ["ecdsa", "ecdh", "pkcs8"] }
 png = "0.17"
 chacha20poly1305 = "0.10"
