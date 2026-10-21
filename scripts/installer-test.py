@@ -2,6 +2,8 @@
 """Static and generated-output checks for the release installers."""
 from __future__ import annotations
 
+import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -9,6 +11,53 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+GOOD_MANIFEST = """{
+  "schema": 2,
+  "product": "rivo",
+  "version": "0.2.11",
+  "platform": "linux",
+  "arch": "amd64",
+  "channel": "stable",
+  "artifacts": [
+    {
+      "file": "rivo-0.2.11-linux-amd64.tar.gz",
+      "sha256": "%s",
+      "bytes": 12695060
+    }
+  ]
+}
+""" % ("a" * 64)
+
+
+def check_manifest_parser(shell: str) -> None:
+    """Run the installer's real manifest parsing functions under sh."""
+    sh = shutil.which("sh")
+    if sh is None:
+        return
+    start = shell.index("manifest_line() {")
+    end = shell.index("MANIFEST_SCHEMA=$(")
+    functions = shell[start:end]
+    cases = {
+        "good": (GOOD_MANIFEST, True),
+        "minified": (json.dumps(json.loads(GOOD_MANIFEST)), False),
+        "duplicate-version": (GOOD_MANIFEST.replace('"channel"', '"version": "9.9.9",\n  "channel"'), False),
+        "injected-value": (GOOD_MANIFEST.replace('"linux"', '"linux; rm -rf /"'), False),
+        "missing-product": (GOOD_MANIFEST.replace('  "product": "rivo",\n', ""), False),
+        "nested-extra-file": (GOOD_MANIFEST.replace('"bytes"', '"file": "evil",\n      "bytes"'), False),
+    }
+    with tempfile.TemporaryDirectory(prefix="rivo-manifest-") as directory:
+        base = Path(directory)
+        for name, (body, ok) in cases.items():
+            (base / "manifest.json").write_text(body, encoding="utf-8", newline="\n")
+            script = (
+                f'TMP_DIR="{base.as_posix()}"\n{functions}\n'
+                'set -e\nfield product >/dev/null\nfield version >/dev/null\nfield platform >/dev/null\n'
+                'field file >/dev/null\nfield sha256 >/dev/null\nmanifest_number schema >/dev/null\n'
+            )
+            result = subprocess.run([sh, "-c", script], capture_output=True, text=True)
+            assert (result.returncode == 0) == ok, f"manifest case {name}: {result.stderr}"
 
 
 def main() -> int:
@@ -31,6 +80,8 @@ def main() -> int:
     assert "must be an https:// URL (http is only allowed for loopback)" in shell
     assert "http is only allowed for loopback" in powershell
     assert "AllowAutoRedirect = $false" in powershell and "Invoke-WebRequest" not in powershell
+
+    check_manifest_parser(shell)
 
     with tempfile.TemporaryDirectory(prefix="rivo-release-notes-") as directory:
         output = Path(directory) / "release-body.md"

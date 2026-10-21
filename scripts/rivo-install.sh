@@ -9,8 +9,7 @@ GITHUB_MIRROR="${GITHUB_MIRROR%/}"
 ASSETS_MIRROR="${ASSETS_MIRROR%/}"
 for MIRROR_VALUE in "$GITHUB_MIRROR" "$ASSETS_MIRROR"; do
     [ -z "$MIRROR_VALUE" ] && continue
-    printf '%s
-' "$MIRROR_VALUE" | grep -Eq '^https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~/-]*)?$' || {
+    printf '%s\n' "$MIRROR_VALUE" | grep -Eq '^https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~/-]*)?$' || {
         echo "RIVO_GITHUB_MIRROR and RIVO_RELEASE_ASSETS_MIRROR must be https:// URLs" >&2
         exit 1
     }
@@ -136,11 +135,29 @@ fetch() {
 
 fetch "$MANIFEST_URL" "$TMP_DIR/manifest.json"
 
-field() {
-    sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" "$TMP_DIR/manifest.json" | head -n 1
+# The manifest is generated with one `"key": value` pair per line. Parse it
+# strictly (anchored lines, each key exactly once, restricted value characters)
+# and reject any other layout instead of guessing.
+manifest_line() {
+    count=$(grep -Ec "^[[:space:]]*\"$1\"[[:space:]]*:" "$TMP_DIR/manifest.json" || true)
+    [ "$count" = 1 ] || { echo "unexpected release manifest layout: \"$1\" must appear exactly once" >&2; return 1; }
 }
 
-MANIFEST_SCHEMA=$(sed -n 's/.*"schema"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$TMP_DIR/manifest.json" | head -n 1)
+field() {
+    manifest_line "$1" || return 1
+    value=$(sed -n "s/^[[:space:]]*\"$1\"[[:space:]]*:[[:space:]]*\"\([A-Za-z0-9._-]*\)\"[[:space:]]*,\{0,1\}[[:space:]]*\$/\1/p" "$TMP_DIR/manifest.json")
+    [ -n "$value" ] || { echo "unexpected release manifest value for \"$1\"" >&2; return 1; }
+    printf '%s\n' "$value"
+}
+
+manifest_number() {
+    manifest_line "$1" || return 1
+    value=$(sed -n "s/^[[:space:]]*\"$1\"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\)[[:space:]]*,\{0,1\}[[:space:]]*\$/\1/p" "$TMP_DIR/manifest.json")
+    [ -n "$value" ] || { echo "unexpected release manifest value for \"$1\"" >&2; return 1; }
+    printf '%s\n' "$value"
+}
+
+MANIFEST_SCHEMA=$(manifest_number schema)
 MANIFEST_PRODUCT=$(field product)
 MANIFEST_VERSION=$(field version)
 MANIFEST_PLATFORM=$(field platform)
