@@ -2615,7 +2615,7 @@ dependencies = [
 
 [[package]]
 name = "rivo"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2666,7 +2666,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-a2a"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-trait",
  "base64",
@@ -2696,7 +2696,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-a2a-server"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-trait",
  "base64",
@@ -2727,7 +2727,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-agent"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -2748,7 +2748,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-core"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "serde",
  "serde_json",
@@ -2757,7 +2757,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-i18n"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "dirs",
  "fluent-bundle",
@@ -2777,7 +2777,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-instance-control"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "anyhow",
  "fs2",
@@ -2794,7 +2794,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-llm"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -2811,7 +2811,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-policy"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "hex",
  "serde",
@@ -2823,7 +2823,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-prompts-management"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "hex",
  "rivo-policy",
@@ -2835,7 +2835,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-session"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -2867,7 +2867,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-storage"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "fs2",
  "hex",
@@ -2886,7 +2886,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-telemetry"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "hex",
  "serde",
@@ -2898,7 +2898,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-test-support"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "serde",
  "serde_json",
@@ -2907,7 +2907,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-tools"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "async-trait",
  "base64",
@@ -2934,7 +2934,7 @@ dependencies = [
 
 [[package]]
 name = "rivo-tui"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "crossterm",
  "ratatui",
@@ -4695,7 +4695,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "base64",
  "futures",
