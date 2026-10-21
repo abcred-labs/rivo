@@ -2,6 +2,17 @@
 
 英文摘要见 [CHANGELOG.en.md](CHANGELOG.en.md)，Release 说明会附带对应版本的英文条目。
 
+## 0.2.12（2026-10-21）
+
+### 安装
+
+- `rivo-install.sh` 严格解析 Release manifest：每个键必须独占一行且恰好出现一次，值限定为安全字符集；其他布局一律拒绝，不再用 `sed` 猜测。
+- 修复镜像地址检查中 `printf` 格式串丢失转义的问题。
+
+### 文档
+
+- 安装指南新增“验证构建来源与 SBOM”：`gh attestation verify`、离线 bundle 验证（需以 UTF-8 读写）和 CycloneDX SBOM 说明。
+
 ## 0.2.11（2026-10-21）
 
 ### 升级与安装加固

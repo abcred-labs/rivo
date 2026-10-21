@@ -2,6 +2,17 @@
 
 Chinese is the primary changelog ([CHANGELOG.md](CHANGELOG.md)); this file mirrors each release for English readers. Release notes on GitHub include the matching entry.
 
+## 0.2.12 (English)
+
+### Installer
+
+- `rivo-install.sh` now parses the release manifest strictly: every key must be on its own line and appear exactly once, and values are limited to a safe character set. Any other layout is rejected instead of guessed at with `sed`.
+- Fixed a `printf` format string in the mirror URL check that had lost its escape.
+
+### Documentation
+
+- The install guide has a new "Verify provenance and the SBOM" section covering `gh attestation verify`, offline bundle verification (read and write the bundle as UTF-8) and the CycloneDX SBOM.
+
 ## 0.2.11 (English)
 
 ### Upgrade and installer hardening
