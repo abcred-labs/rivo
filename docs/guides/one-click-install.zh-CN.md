@@ -98,6 +98,35 @@ python scripts/print-install-commands.py --platform linux --arch amd64 --package
 
 脚本只打印校验、解压、临时 PATH 和版本检查命令，不调用安装器，也不修改系统 PATH。
 
+## 验证构建来源与 SBOM
+
+除 SHA-256 sidecar 外，0.2.11 起每个归档都有 GitHub 构建来源 attestation，每个平台还有一个
+CycloneDX SBOM 资产，名为 `rivo-<version>-<platform>-<arch>.sbom.cdx.json`。attestation 证明
+这份归档字节由哪个仓库、tag、提交和工作流构建，这是 SHA-256 sidecar 做不到的。归档仍未做平台代码签名。
+
+使用 [GitHub CLI](https://cli.github.com/)（先 `gh auth login`）：
+
+```sh
+gh attestation verify rivo-<version>-linux-amd64.tar.gz --repo abcred-labs/rivo
+```
+
+成功时退出码为 0，证书应指向 `abcred-labs/rivo`、`refs/tags/v<version>` 和 `Release` 工作流；
+加 `--format json` 可查看详情。归档被改动后验证会失败。
+
+若 GitHub API 访问不便，可用 bundle 离线验证：先经镜像下载归档，再从公开 attestations 接口
+（`https://api.github.com/repos/abcred-labs/rivo/attestations/sha256:<归档 sha256>`）取回第一条
+attestation 的 `bundle` 对象，保存为单行的 `bundle.jsonl`，然后执行：
+
+```sh
+gh attestation verify rivo-<version>-linux-amd64.tar.gz --repo abcred-labs/rivo --bundle bundle.jsonl
+```
+
+bundle 必须以 UTF-8 读写（Windows 上 Python 默认使用系统代码页，会破坏被签名的 checkpoint 文本，
+请使用 `python -X utf8`）。`gh` 仍要求设置 token，但离线验证不会调用 API。
+
+SBOM 列出每个第三方 Rust crate 的版本、许可证和 Cargo.lock 中的 SHA-256，可交给任何
+CycloneDX 1.5 工具（如漏洞扫描器）使用。
+
 ## 从源码构建
 
 ```powershell

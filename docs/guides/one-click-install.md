@@ -140,6 +140,40 @@ python scripts/print-install-commands.py --platform linux --arch amd64 \
 The helper prints verification, extraction, temporary PATH and version commands. It
 does not invoke an installer and does not modify the system PATH.
 
+## Verify provenance and the SBOM
+
+Besides the SHA-256 sidecar, every archive from 0.2.11 onward has a GitHub build-provenance
+attestation, and each platform has a CycloneDX SBOM asset named
+`rivo-<version>-<platform>-<arch>.sbom.cdx.json`. The attestation proves which repository,
+tag, commit and workflow built the exact archive bytes; the SHA-256 sidecar alone cannot.
+Archives are still not platform code-signed.
+
+With the [GitHub CLI](https://cli.github.com/) (authenticated with `gh auth login`):
+
+```sh
+gh attestation verify rivo-<version>-linux-amd64.tar.gz --repo abcred-labs/rivo
+```
+
+A successful run exits with status 0 and the certificate identifies `abcred-labs/rivo`, the
+`refs/tags/v<version>` ref and the `Release` workflow. Use `--format json` to see the details.
+A modified archive fails verification.
+
+On networks where the GitHub API is awkward you can verify offline from a bundle. Download the
+archive through the mirror, fetch the bundle from the public attestations API
+(`https://api.github.com/repos/abcred-labs/rivo/attestations/sha256:<archive sha256>`), save the
+`bundle` object of the first attestation as a single-line `bundle.jsonl`, and run:
+
+```sh
+gh attestation verify rivo-<version>-linux-amd64.tar.gz --repo abcred-labs/rivo --bundle bundle.jsonl
+```
+
+Read and write the bundle as UTF-8 (on Windows, Python defaults to the system code page and
+corrupts the signed checkpoint text; use `python -X utf8`). `gh` still needs a token to be
+set, but offline verification does not call the API.
+
+The SBOM lists every third-party Rust crate with its version, license and Cargo.lock SHA-256.
+It can be fed to any CycloneDX 1.5 consumer, for example a vulnerability scanner.
+
 ## Make PATH persistent
 
 The commands above change PATH for the current shell. For a persistent installation,
