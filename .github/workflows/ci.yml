@@ -92,6 +92,13 @@ jobs:
       - name: Test (tools serialized)
         working-directory: runtime
         run: cargo test -p rivo-tools --lib --locked -- --test-threads=1
+      - name: Repository checks from xtask (whitespace, A2A protocol, dependency direction)
+        if: runner.os == 'Linux'
+        run: |
+          git show --check --format= HEAD
+          cd runtime
+          cargo run -p xtask --locked -- a2a-verify-protocol
+          cargo run -p xtask --locked -- dependency-direction
       - name: Markdown links
         run: python scripts/check_markdown_links.py
       - name: Documentation language parity

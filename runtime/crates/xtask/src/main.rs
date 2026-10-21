@@ -58,6 +58,7 @@ async fn main() -> ExitCode {
             }
         },
         Some("a2a-verify-protocol") if args.len() == 1 => run_a2a_verify_protocol(&repo),
+        Some("dependency-direction") if args.len() == 1 => run_dependency_direction_check(&repo),
         Some("preview-gate") if args.len() == 1 => run_preview_gate(&repo),
         Some("release-gate") if args.len() == 1 => run_release_gate(&repo),
         Some("release-test") => match parse_release_args(&args[1..]) {
@@ -94,6 +95,7 @@ fn print_usage() {
     eprintln!("  cargo xtask coverage");
     eprintln!("  cargo xtask external-test --category <tui-pty|cdp|oauth|a2a-local|all>");
     eprintln!("  cargo xtask a2a-verify-protocol");
+    eprintln!("  cargo xtask dependency-direction");
     eprintln!("  cargo xtask preview-gate");
     eprintln!("  cargo xtask release-gate");
     eprintln!("  cargo xtask release-test --live-config <path> --report-dir <path>");
