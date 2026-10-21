@@ -1,6 +1,21 @@
 #!/bin/sh
 set -eu
 
+GITHUB_ORIGIN=https://github.com
+ASSETS_ORIGIN=https://release-assets.githubusercontent.com
+GITHUB_MIRROR="${RIVO_GITHUB_MIRROR:-}"
+ASSETS_MIRROR="${RIVO_RELEASE_ASSETS_MIRROR:-}"
+GITHUB_MIRROR="${GITHUB_MIRROR%/}"
+ASSETS_MIRROR="${ASSETS_MIRROR%/}"
+for MIRROR_VALUE in "$GITHUB_MIRROR" "$ASSETS_MIRROR"; do
+    [ -z "$MIRROR_VALUE" ] && continue
+    printf '%s
+' "$MIRROR_VALUE" | grep -Eq '^https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~/-]*)?$' || {
+        echo "RIVO_GITHUB_MIRROR and RIVO_RELEASE_ASSETS_MIRROR must be https:// URLs" >&2
+        exit 1
+    }
+done
+
 REPOSITORY="${RIVO_REPOSITORY:-abcred-labs/rivo}"
 VERSION="${RIVO_INSTALL_VERSION:-latest}"
 INSTALL_ROOT="${RIVO_INSTALL_ROOT:-/usr/local/lib/rivo}"
@@ -16,6 +31,11 @@ Options:
   --install-root PATH     Override the system install root
   --base-url URL          Use a release mirror
   -h, --help              Show this help
+
+Mainland China networks can set these before running the installer:
+  RIVO_GITHUB_MIRROR          e.g. https://github-mirror.abc.red
+  RIVO_RELEASE_ASSETS_MIRROR  e.g. https://gh-release-assets.abc.red
+Mirrors only speed up downloads; SHA-256 verification is unchanged.
 EOF
 }
 
@@ -61,10 +81,11 @@ case "$(uname -m)" in
 esac
 
 if [ -z "$BASE_URL" ]; then
+    DOWNLOAD_ORIGIN="${GITHUB_MIRROR:-$GITHUB_ORIGIN}"
     if [ "$VERSION" = latest ]; then
-        BASE_URL="https://github.com/$REPOSITORY/releases/latest/download"
+        BASE_URL="$DOWNLOAD_ORIGIN/$REPOSITORY/releases/latest/download"
     else
-        BASE_URL="https://github.com/$REPOSITORY/releases/download/v$VERSION"
+        BASE_URL="$DOWNLOAD_ORIGIN/$REPOSITORY/releases/download/v$VERSION"
     fi
     MANIFEST_URL="$BASE_URL/release-manifest-$PLATFORM-$ARCH.json"
     MIRROR=0
@@ -80,8 +101,33 @@ command -v tar >/dev/null 2>&1 || { echo "tar is required" >&2; exit 1; }
 TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/rivo-install.XXXXXX")
 trap 'rm -rf "$TMP_DIR"' EXIT HUP INT TERM
 
+# Follows redirects one HTTPS hop at a time so GitHub and release-asset
+# redirects can be rewritten to the configured mirrors.
 fetch() {
-    curl --fail --silent --show-error --location --retry 3 "$1" -o "$2"
+    fetch_url=$1
+    fetch_hop=0
+    while [ "$fetch_hop" -lt 6 ]; do
+        fetch_location=$(curl --fail --silent --show-error --retry 3 --tlsv1.2             -w '%{redirect_url}' -o "$2" "$fetch_url") || return 1
+        [ -n "$fetch_location" ] || return 0
+        case "$fetch_location" in
+            https://*) ;;
+            *) echo "refusing non-HTTPS redirect" >&2; return 1 ;;
+        esac
+        if [ -n "$GITHUB_MIRROR" ]; then
+            case "$fetch_location" in
+                "$GITHUB_ORIGIN"/*) fetch_location="$GITHUB_MIRROR${fetch_location#"$GITHUB_ORIGIN"}" ;;
+            esac
+        fi
+        if [ -n "$ASSETS_MIRROR" ]; then
+            case "$fetch_location" in
+                "$ASSETS_ORIGIN"/*) fetch_location="$ASSETS_MIRROR${fetch_location#"$ASSETS_ORIGIN"}" ;;
+            esac
+        fi
+        fetch_url=$fetch_location
+        fetch_hop=$((fetch_hop + 1))
+    done
+    echo "too many redirects" >&2
+    return 1
 }
 
 fetch "$MANIFEST_URL" "$TMP_DIR/manifest.json"
@@ -140,7 +186,11 @@ printf '%s\n' "$EXPECTED_SHA" | grep -Eq '^[0-9a-fA-F]{64}$' || { echo "invalid 
 [ "$ACTUAL_SHA" = "$EXPECTED_SHA" ] || { echo "manifest checksum mismatch" >&2; exit 1; }
 [ "$ACTUAL_SHA" = "$SIDECAR_SHA" ] || { echo "checksum sidecar mismatch" >&2; exit 1; }
 
-tar -xzf "$ARCHIVE" -C "$TMP_DIR"
+if tar -tzf "$ARCHIVE" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+    echo "archive contains an unsafe path" >&2
+    exit 1
+fi
+tar -xzf "$ARCHIVE" -C "$TMP_DIR" --no-same-owner
 PAYLOAD="$TMP_DIR/rivo-$MANIFEST_VERSION-$PLATFORM-$ARCH"
 [ -x "$PAYLOAD/rivo" ] || { echo "archive does not contain an executable rivo" >&2; exit 1; }
 [ -f "$PAYLOAD/share/rivo/languages/en-US.ftl" ] || { echo "archive is missing language resources" >&2; exit 1; }

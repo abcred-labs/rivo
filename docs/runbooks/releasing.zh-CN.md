@@ -43,13 +43,13 @@ Release 在各 runner 构建 release 二进制；Linux 另外执行 glibc ABI �
 
 Windows 系统集成面向 Windows 11 x64。Linux/macOS 提供通用 CLI/TUI，未包含 Windows 专属 Computer Use 和浏览器扩展接线。Linux 使用 GNU/glibc 目标，运行时需要 `libdbus-1.so.3`（Ubuntu 的 `libdbus-1-3`）；源码构建另需 `libdbus-1-dev`、`pkg-config`、C/C++ 工具链和 CMake。Linux 构件在 Ubuntu 22.04 构建，并在 Debian 12 中执行 smoke；Debian 12 的 glibc 2.36 是当前 Linux 最低支持基线。不支持将其当作 musl/Alpine 包。所有归档未做平台代码签名，SHA-256 仅校验完整性。
 
-## 3. 先准备草稿，再公开发布
+## 3. 门禁通过后发布
 
 1. 更新 [CHANGELOG](../../CHANGELOG.md) 的功能、兼容性及已知限制，完成源码和依赖门禁，提交并同步到目标仓库。
-2. 在 Actions 的 Release workflow 使用 `workflow_dispatch`，输入 `major.minor.patch` 生成候选；或推送相应 `v<version>` tag。两条路径都只创建 **draft Release**，不会自动成为 latest。
+2. 在 Actions 的 Release workflow 使用 `workflow_dispatch`，输入 `major.minor.patch` 生成候选；或推送相应 `v<version>` tag。两条路径都会先运行完整门禁和五目标构建矩阵，全部通过后才发布为 latest；任一作业失败则不发布任何内容。
 3. 检查五个目标的构件、checksum、manifest 和 smoke 报告，确认其 commit 一致；核对下载说明与限制。相同版本不允许替换已公开的构件，修复须递增版本。
 4. 在 GitHub 上核验私密漏洞报告、Secret scanning/push protection、Dependabot，以及主分支和版本 tag 保护。私密报告入口须与 [SECURITY](../../SECURITY.md) 一致。
-5. 维护者审核草稿后手动公开。当前版本和升级协议仅支持三段数字版本，manifest 使用 `stable` 通道；尚未实现独立 prerelease 升级通道。首个 0.x 版本仍须明确实验性能力及限制，不能宣称生产稳定。
+5. 发布后维护者复核。当前版本和升级协议仅支持三段数字版本，manifest 使用 `stable` 通道；尚未实现独立 prerelease 升级通道。首个 0.x 版本仍须明确实验性能力及限制，不能宣称生产稳定。
 6. 公开后从实际 Release 下载归档和校验文件复核，验证 `rivo upgrade` 的 GitHub 默认地址；如发布后发现问题，撤下有问题版本的 latest 标记并发布修复版本，不改写原构件。
 
 分支保护应要求当前 CI 的五个检查：三种 `Quality (...)`、`Rust 1.88 minimum version`、`Dependency security and licenses`。设置 tag 规则时须允许维护者/Release workflow 创建新版本，同时禁止改写或删除已发布 tag。

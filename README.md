@@ -30,6 +30,21 @@ irm https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.ps
 rivo --version
 ```
 
+**Mainland China:** GitHub downloads are often slow or interrupted. Use the download mirrors
+(the installer still validates the manifest and SHA-256 against the GitHub release):
+
+```sh
+curl -fsSL https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red sh
+rivo --version
+```
+
+```powershell
+$env:RIVO_GITHUB_MIRROR = 'https://github-mirror.abc.red'
+$env:RIVO_RELEASE_ASSETS_MIRROR = 'https://gh-release-assets.abc.red'
+irm https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
 The installers verify the release manifest and SHA-256 checksum before installing
 the complete archive. They require administrator privileges and install the
 system-wide CLI while keeping user configuration, credentials and sessions outside

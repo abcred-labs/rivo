@@ -24,6 +24,11 @@ def main() -> int:
     assert "Release manifest must contain exactly one artifact." in powershell
     assert "Release checksum sidecar is empty." in powershell
     assert "print-install-commands" not in shell
+    for text in (shell, powershell):
+        assert "RIVO_GITHUB_MIRROR" in text and "RIVO_RELEASE_ASSETS_MIRROR" in text
+        assert "release-assets.githubusercontent.com" in text
+    assert "--no-same-owner" in shell and "unsafe path" in shell
+    assert "AllowAutoRedirect = $false" in powershell and "Invoke-WebRequest" not in powershell
 
     with tempfile.TemporaryDirectory(prefix="rivo-release-notes-") as directory:
         output = Path(directory) / "release-body.md"
@@ -54,6 +59,7 @@ def main() -> int:
         assert "rivo-0.2.0-macos-amd64.tar.gz" in body
         assert "rivo-0.2.0-macos-arm64.tar.gz.sha256" in body
         assert "rivo-0.2.0-windows-amd64.zip" in body
+        assert "github-mirror.abc.red" in body and "gh-release-assets.abc.red" in body
         assert "rivo upgrade --check" in body
         assert "rivo upgrade --apply --yes" in body
 

@@ -31,6 +31,46 @@ The installer scripts are published as `rivo-install.sh` and `rivo-install.ps1`
 assets on every Release. The repository's `print-install-commands.py` helper only
 prints manual archive commands; it does not install or modify PATH.
 
+## Install from mainland China
+
+Direct downloads from GitHub are often slow or interrupted on mainland China networks.
+Point the installer at the download mirrors instead:
+
+| Variable | Mirror | Replaces |
+| --- | --- | --- |
+| `RIVO_GITHUB_MIRROR` | `https://github-mirror.abc.red` | `https://github.com` (manifest, installer and archive URLs) |
+| `RIVO_RELEASE_ASSETS_MIRROR` | `https://gh-release-assets.abc.red` | `https://release-assets.githubusercontent.com` (the redirect GitHub uses for the actual download) |
+
+Linux or macOS. `sudo` clears the environment, so pass the variables with `sudo env`:
+
+```sh
+curl -fsSL https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red sh
+rivo --version
+```
+
+Windows, from an elevated PowerShell (`-GithubMirror` and `-ReleaseAssetsMirror` are the equivalent parameters):
+
+```powershell
+$env:RIVO_GITHUB_MIRROR = 'https://github-mirror.abc.red'
+$env:RIVO_RELEASE_ASSETS_MIRROR = 'https://gh-release-assets.abc.red'
+irm https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
+The installers follow redirects one HTTPS hop at a time and rewrite each hop to the
+configured mirror. Mirrors only speed up transport: the manifest and archive are still
+checked against the SHA-256 values and expected names, and a tampered mirror response is
+rejected. Both variables must be `https://` URLs and may be used independently. The
+`--base-url` option is separate: it selects a self-hosted directory layout
+(`<platform>-<arch>/release-manifest.json`) rather than a GitHub proxy.
+
+`rivo upgrade` honors the same two variables (they are not persisted, so keep them in the
+environment of the upgrade command):
+
+```sh
+sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red rivo upgrade --apply
+```
+
 ## Install a fixed release manually
 
 Rivo releases contain portable archives for five targets:

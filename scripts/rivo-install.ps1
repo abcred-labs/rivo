@@ -4,7 +4,9 @@ param(
     [switch]$Help,
     [string]$Version = $(if ($env:RIVO_INSTALL_VERSION) { $env:RIVO_INSTALL_VERSION } else { 'latest' }),
     [string]$InstallRoot = $(if ($env:RIVO_INSTALL_ROOT) { $env:RIVO_INSTALL_ROOT } else { Join-Path $env:ProgramFiles 'Rivo' }),
-    [string]$BaseUrl = $(if ($env:RIVO_INSTALL_BASE_URL) { $env:RIVO_INSTALL_BASE_URL } else { '' })
+    [string]$BaseUrl = $(if ($env:RIVO_INSTALL_BASE_URL) { $env:RIVO_INSTALL_BASE_URL } else { '' }),
+    [string]$GithubMirror = $(if ($env:RIVO_GITHUB_MIRROR) { $env:RIVO_GITHUB_MIRROR } else { '' }),
+    [string]$ReleaseAssetsMirror = $(if ($env:RIVO_RELEASE_ASSETS_MIRROR) { $env:RIVO_RELEASE_ASSETS_MIRROR } else { '' })
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,11 +18,27 @@ Parameters:
   -Version VERSION      Install VERSION instead of latest
   -InstallRoot PATH     Override the system install root
   -BaseUrl URL           Use a release mirror
+  -GithubMirror URL      Mirror for https://github.com (mainland China: https://github-mirror.abc.red)
+  -ReleaseAssetsMirror URL
+                         Mirror for https://release-assets.githubusercontent.com
+                         (mainland China: https://gh-release-assets.abc.red)
   -Help                  Show this help
+
+The mirror parameters can also be set with RIVO_GITHUB_MIRROR and
+RIVO_RELEASE_ASSETS_MIRROR. Mirrors only speed up downloads; SHA-256 verification is unchanged.
 '@
     exit 0
 }
 $repository = if ($env:RIVO_REPOSITORY) { $env:RIVO_REPOSITORY } else { 'abcred-labs/rivo' }
+$githubOrigin = 'https://github.com'
+$assetsOrigin = 'https://release-assets.githubusercontent.com'
+$GithubMirror = $GithubMirror.Trim().TrimEnd('/')
+$ReleaseAssetsMirror = $ReleaseAssetsMirror.Trim().TrimEnd('/')
+foreach ($mirrorValue in @($GithubMirror, $ReleaseAssetsMirror)) {
+    if ($mirrorValue -and $mirrorValue -notmatch '^https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~/-]*)?$') {
+        throw 'RIVO_GITHUB_MIRROR and RIVO_RELEASE_ASSETS_MIRROR must be https:// URLs.'
+    }
+}
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run this installer from an elevated PowerShell window.' }
 
@@ -28,8 +46,47 @@ $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitect
 if ($architecture -eq 'X64') { $arch = 'amd64' } elseif ($architecture -eq 'Arm64') { $arch = 'arm64' } else { throw "Unsupported Windows architecture: $architecture" }
 if ($arch -ne 'amd64') { throw 'Windows release archives currently support amd64 only.' }
 
+function Invoke-RivoDownload([string]$Url, [string]$OutFile) {
+    # Follows redirects one HTTPS hop at a time so GitHub and release-asset
+    # redirects can be rewritten to the configured mirrors.
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    for ($hop = 0; $hop -lt 6; $hop++) {
+        $request = [System.Net.HttpWebRequest]::Create($Url)
+        $request.AllowAutoRedirect = $false
+        $request.UserAgent = 'rivo-installer'
+        try {
+            $response = $request.GetResponse()
+        } catch [System.Net.WebException] {
+            if ($null -eq $_.Exception.Response) { throw }
+            $response = $_.Exception.Response
+        }
+        try {
+            $status = [int]$response.StatusCode
+            if ($status -ge 300 -and $status -lt 400) {
+                $location = $response.Headers['Location']
+                if ([string]::IsNullOrWhiteSpace($location)) { throw "HTTP $status from $Url has no Location header." }
+                $next = (New-Object System.Uri((New-Object System.Uri($Url)), $location)).AbsoluteUri
+                if (-not $next.StartsWith('https://')) { throw 'Refusing non-HTTPS redirect.' }
+                if ($GithubMirror -and $next.StartsWith("$githubOrigin/")) { $next = $GithubMirror + $next.Substring($githubOrigin.Length) }
+                if ($ReleaseAssetsMirror -and $next.StartsWith("$assetsOrigin/")) { $next = $ReleaseAssetsMirror + $next.Substring($assetsOrigin.Length) }
+                $Url = $next
+                continue
+            }
+            if ($status -ne 200) { throw "HTTP $status from $Url." }
+            $source = $response.GetResponseStream()
+            $target = [IO.File]::Create($OutFile)
+            try { $source.CopyTo($target) } finally { $target.Dispose(); $source.Dispose() }
+            return
+        } finally {
+            $response.Dispose()
+        }
+    }
+    throw "Too many redirects from $Url."
+}
+
 if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-    if ($Version -eq 'latest') { $BaseUrl = "https://github.com/$repository/releases/latest/download" } else { $BaseUrl = "https://github.com/$repository/releases/download/v$Version" }
+    $downloadOrigin = if ($GithubMirror) { $GithubMirror } else { $githubOrigin }
+    if ($Version -eq 'latest') { $BaseUrl = "$downloadOrigin/$repository/releases/latest/download" } else { $BaseUrl = "$downloadOrigin/$repository/releases/download/v$Version" }
     $manifestUrl = "$BaseUrl/release-manifest-windows-amd64.json"
     $mirror = $false
 } else {
@@ -42,7 +99,7 @@ $temp = Join-Path ([IO.Path]::GetTempPath()) ('rivo-install-' + [Guid]::NewGuid(
 New-Item -ItemType Directory -Path $temp | Out-Null
 try {
     $manifestPath = Join-Path $temp 'manifest.json'
-    Invoke-WebRequest -UseBasicParsing -Uri $manifestUrl -OutFile $manifestPath
+    Invoke-RivoDownload $manifestUrl $manifestPath
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.schema -ne 2 -or $manifest.product -ne 'rivo') { throw 'Unsupported Rivo release manifest.' }
     if ($manifest.channel -ne 'stable') { throw 'Release manifest is not a stable release.' }
@@ -59,8 +116,8 @@ try {
     $artifactBase = if ($mirror) { "$BaseUrl/windows-amd64" } else { $BaseUrl }
     $archive = Join-Path $temp $artifact.file
     $sidecar = "$archive.sha256"
-    Invoke-WebRequest -UseBasicParsing -Uri "$artifactBase/$($artifact.file)" -OutFile $archive
-    Invoke-WebRequest -UseBasicParsing -Uri "$artifactBase/$($artifact.file).sha256" -OutFile $sidecar
+    Invoke-RivoDownload "$artifactBase/$($artifact.file)" $archive
+    Invoke-RivoDownload "$artifactBase/$($artifact.file).sha256" $sidecar
     $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $archive
     if ($null -eq $hash -or [string]::IsNullOrWhiteSpace([string]$hash.Hash)) { throw 'Unable to calculate the release checksum.' }
     $actual = ([string]$hash.Hash).ToLowerInvariant()

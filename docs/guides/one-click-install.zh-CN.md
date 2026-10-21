@@ -25,6 +25,42 @@ Unix 使用其他 `--install-root` 时，启动链接会写入 `<install-root>/b
 每个 Release 都会上传 `rivo-install.sh` 和 `rivo-install.ps1`。仓库中的
 `print-install-commands.py` 只打印手动归档命令，不执行安装或修改 PATH。
 
+## 中国大陆安装
+
+中国大陆网络直连 GitHub 下载通常很慢或被中断，请让安装器改用下载镜像：
+
+| 环境变量 | 镜像地址 | 替换的原始地址 |
+| --- | --- | --- |
+| `RIVO_GITHUB_MIRROR` | `https://github-mirror.abc.red` | `https://github.com`（manifest、安装脚本和归档地址） |
+| `RIVO_RELEASE_ASSETS_MIRROR` | `https://gh-release-assets.abc.red` | `https://release-assets.githubusercontent.com`（GitHub 实际下载时使用的重定向地址） |
+
+Linux 或 macOS：`sudo` 默认清除环境变量，需用 `sudo env` 传入：
+
+```sh
+curl -fsSL https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red sh
+rivo --version
+```
+
+Windows 管理员 PowerShell（等价的命名参数为 `-GithubMirror`、`-ReleaseAssetsMirror`）：
+
+```powershell
+$env:RIVO_GITHUB_MIRROR = 'https://github-mirror.abc.red'
+$env:RIVO_RELEASE_ASSETS_MIRROR = 'https://gh-release-assets.abc.red'
+irm https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
+安装器逐跳跟随 HTTPS 重定向，并把每一跳改写到对应镜像。镜像只加速传输：manifest 与归档仍按
+预期名称和 SHA-256 校验，镜像返回被篡改的内容会被拒绝。两个变量都必须是 `https://` 地址，
+可单独使用。`--base-url` 是另一回事：它指向自建的目录布局
+（`<platform>-<arch>/release-manifest.json`），不是 GitHub 代理。
+
+`rivo upgrade` 同样识别这两个变量（不会持久化，需放在升级命令的环境中）：
+
+```sh
+sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red rivo upgrade --apply
+```
+
 ## 手动安装固定版本
 
 Rivo 当前发布五种便携归档：Windows amd64 为 `.zip`，Linux amd64/arm64 和 macOS amd64/arm64 为 `.tar.gz`。当前 Release 不提供 MSI、PKG 或 DEB。

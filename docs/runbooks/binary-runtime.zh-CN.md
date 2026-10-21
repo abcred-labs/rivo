@@ -34,9 +34,11 @@ rivo sessions path
 rivo upgrade --check
 ```
 
-V1 命令读取当前平台 manifest 并报告是否有更新，不会下载、安装、替换、重启或修改正在运行的 CLI、TUI 或 app-server。可通过 `RIVO_RELEASE_BASE_URL` 使用镜像；镜像必须提供 `<platform>-<arch>/release-manifest.json`。
+`--check` 读取当前平台 manifest 并报告是否有更新，不会下载或安装。`rivo upgrade --apply`（非交互加 `--yes`）会下载归档、校验 manifest 与 SHA-256，原子替换安装并保留一个上一版本，执行前请停止其他 Rivo 进程。
 
-升级时停止 Rivo，下载并校验新归档，替换旧目录，再运行 `rivo --version`。已发布版本和归档不可覆盖，修复应发布新的 patch 版本。
+`RIVO_RELEASE_BASE_URL` 可指向自建镜像，镜像必须提供 `<platform>-<arch>/release-manifest.json`。GitHub 访问较慢的网络可设置 `RIVO_GITHUB_MIRROR` 与 `RIVO_RELEASE_ASSETS_MIRROR`（均为 `https://` 地址，例如 `https://github-mirror.abc.red` 和 `https://gh-release-assets.abc.red`），改写 GitHub 与 release-assets 的重定向；校验逻辑不变。详见[安装指南](../guides/one-click-install.zh-CN.md#中国大陆安装)。
+
+手动升级时停止 Rivo，下载并校验新归档，替换旧目录，再运行 `rivo --version`。已发布版本和归档不可覆盖，修复应发布新的 patch 版本。
 
 ## 本地数据和诊断
 

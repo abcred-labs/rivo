@@ -38,13 +38,20 @@ slash commands are documented in the [TUI guide](../guides/tui.md).
 rivo upgrade --check
 ```
 
-The V1 command reads the current platform manifest and reports whether a newer
-archive exists. It does not download, install, replace, restart, or alter a running
-CLI, TUI or app-server. `RIVO_RELEASE_BASE_URL` can point to a compatible mirror;
-the mirror must expose `<platform>-<arch>/release-manifest.json` in its directory
-layout.
+`--check` reads the current platform manifest and reports whether a newer archive
+exists; it never downloads or installs anything. `rivo upgrade --apply` (add `--yes`
+for non-interactive use) downloads the archive, verifies the manifest and SHA-256,
+atomically replaces the installation and keeps one previous version. Stop other Rivo
+processes first.
 
-To upgrade, stop Rivo processes, download and verify the new archive, replace the
+`RIVO_RELEASE_BASE_URL` can point to a self-hosted mirror that exposes
+`<platform>-<arch>/release-manifest.json`. On networks where GitHub is slow, set
+`RIVO_GITHUB_MIRROR` and `RIVO_RELEASE_ASSETS_MIRROR` (both `https://` URLs, for example
+`https://github-mirror.abc.red` and `https://gh-release-assets.abc.red`) to rewrite
+GitHub and release-asset redirects; checksum verification is unchanged. See the
+[install guide](../guides/one-click-install.md#install-from-mainland-china).
+
+For a manual upgrade, stop Rivo processes, download and verify the new archive, replace the
 old extracted binary directory, and run `rivo --version`. Published versions and
 archives are immutable; publish a new patch version for a correction.
 

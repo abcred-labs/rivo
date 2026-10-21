@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generator": "cargo-about 0.9.2",
-  "cargo_lock_sha256": "3d6626b8eb69d35add1eb8d05882b4ab36a00629ed3daa0d31cfc438995abd3c",
+  "cargo_lock_sha256": "a2d7053db8fc844ec4f82eaf82300e6c28a91fb1d6e11fd9f55db20c884c19a4",
   "targets": [
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",

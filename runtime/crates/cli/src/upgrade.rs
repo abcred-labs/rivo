@@ -13,6 +13,106 @@ use std::process::Command;
 const DEFAULT_RELEASE_BASE_URL: &str =
     "https://github.com/abcred-labs/rivo/releases/latest/download";
 const DEFAULT_RELEASE_DOWNLOAD_ROOT: &str = "https://github.com/abcred-labs/rivo/releases/download";
+const GITHUB_ORIGIN: &str = "https://github.com";
+const RELEASE_ASSETS_ORIGIN: &str = "https://release-assets.githubusercontent.com";
+const MAX_REDIRECTS: usize = 5;
+
+/// Optional download mirrors for networks with slow or blocked GitHub access.
+/// Only the transport is redirected: the manifest, artifact names and SHA-256
+/// checks are unchanged, so a tampered mirror response is rejected.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+struct Mirrors {
+    github: Option<String>,
+    release_assets: Option<String>,
+}
+
+impl Mirrors {
+    fn from_env() -> anyhow::Result<Self> {
+        Self::parse(
+            std::env::var("RIVO_GITHUB_MIRROR").ok().as_deref(),
+            std::env::var("RIVO_RELEASE_ASSETS_MIRROR").ok().as_deref(),
+        )
+    }
+
+    fn parse(github: Option<&str>, release_assets: Option<&str>) -> anyhow::Result<Self> {
+        Ok(Self {
+            github: normalize_mirror("RIVO_GITHUB_MIRROR", github)?,
+            release_assets: normalize_mirror("RIVO_RELEASE_ASSETS_MIRROR", release_assets)?,
+        })
+    }
+
+    fn rewrite(&self, url: &str) -> String {
+        for (origin, mirror) in [
+            (GITHUB_ORIGIN, &self.github),
+            (RELEASE_ASSETS_ORIGIN, &self.release_assets),
+        ] {
+            if let (Some(mirror), Some(rest)) = (mirror, url.strip_prefix(origin)) {
+                if rest.starts_with('/') {
+                    return format!("{mirror}{rest}");
+                }
+            }
+        }
+        url.to_owned()
+    }
+}
+
+fn normalize_mirror(name: &str, value: Option<&str>) -> anyhow::Result<Option<String>> {
+    let value = value
+        .map(|item| item.trim().trim_end_matches('/'))
+        .unwrap_or("");
+    if value.is_empty() {
+        return Ok(None);
+    }
+    let valid = value.strip_prefix("https://").is_some_and(|rest| {
+        !rest.is_empty()
+            && !rest.starts_with('/')
+            && rest
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || ".-:/_~".contains(c))
+    });
+    if !valid {
+        bail!("{name} must be an https:// URL");
+    }
+    Ok(Some(value.to_owned()))
+}
+
+struct Http {
+    client: Client,
+    mirrors: Mirrors,
+}
+
+impl Http {
+    /// GETs `url`, following at most `MAX_REDIRECTS` HTTPS redirects by hand so each
+    /// hop can be rewritten to its configured mirror.
+    async fn get(&self, url: &str) -> anyhow::Result<reqwest::Response> {
+        let mut current = self.mirrors.rewrite(url);
+        for _ in 0..=MAX_REDIRECTS {
+            let response = self
+                .client
+                .get(&current)
+                .send()
+                .await
+                .with_context(|| format!("HTTP request failed: {current}"))?;
+            if !response.status().is_redirection() {
+                return Ok(response);
+            }
+            let location = response
+                .headers()
+                .get(reqwest::header::LOCATION)
+                .and_then(|value| value.to_str().ok())
+                .context("HTTP redirect has no Location header")?;
+            let next = response
+                .url()
+                .join(location)
+                .context("HTTP redirect has an invalid Location header")?;
+            if next.scheme() != "https" {
+                bail!("refusing non-HTTPS redirect");
+            }
+            current = self.mirrors.rewrite(next.as_str());
+        }
+        bail!("too many HTTP redirects from {url}")
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Target {
@@ -84,20 +184,26 @@ pub async fn run(apply: bool, yes: bool) -> anyhow::Result<()> {
     let source = release_source(base, configured.is_none(), target);
     let client = Client::builder()
         .user_agent(format!("rivo/{current}"))
+        .redirect(reqwest::redirect::Policy::none())
         .build()
         .context(ui::text(
             "cli-upgrade-http-client-failed",
             "Failed to create the upgrade HTTP client",
         ))?;
-    let manifest: ReleaseManifest = fetch_json(&client, &source.manifest_url)
-        .await
-        .with_context(|| {
-            ui::text_with(
-                "cli-upgrade-manifest-read-failed",
-                &format!("Failed to read latest manifest: {}", source.manifest_url),
-                &[("url", source.manifest_url.clone())],
-            )
-        })?;
+    let http = Http {
+        client,
+        mirrors: Mirrors::from_env()?,
+    };
+    let manifest: ReleaseManifest =
+        fetch_json(&http, &source.manifest_url)
+            .await
+            .with_context(|| {
+                ui::text_with(
+                    "cli-upgrade-manifest-read-failed",
+                    &format!("Failed to read latest manifest: {}", source.manifest_url),
+                    &[("url", source.manifest_url.clone())],
+                )
+            })?;
     validate_manifest(&manifest, target)?;
     println!(
         "{}",
@@ -141,7 +247,7 @@ pub async fn run(apply: bool, yes: bool) -> anyhow::Result<()> {
             );
             Ok(())
         }
-        Ordering::Less => apply_update(&client, &source, &manifest, target, yes).await,
+        Ordering::Less => apply_update(&http, &source, &manifest, target, yes).await,
     }
 }
 
@@ -166,7 +272,7 @@ fn release_source(base: &str, default_github: bool, target: Target) -> ReleaseSo
 }
 
 async fn apply_update(
-    client: &Client,
+    http: &Http,
     source: &ReleaseSource,
     manifest: &ReleaseManifest,
     target: Target,
@@ -206,12 +312,12 @@ async fn apply_update(
     };
     let archive = temp.path().join(&artifact.file);
     download_to(
-        client,
+        http,
         &format!("{artifact_base}/{}", artifact.file),
         &archive,
     )
     .await?;
-    verify_archive(client, &artifact_base, &artifact, &archive).await?;
+    verify_archive(http, &artifact_base, &artifact, &archive).await?;
     let extracted = temp.path().join("extracted");
     fs::create_dir_all(&extracted)?;
     extract_archive(&archive, &extracted, target)?;
@@ -235,12 +341,8 @@ async fn apply_update(
     }
 }
 
-async fn download_to(client: &Client, url: &str, path: &Path) -> anyhow::Result<()> {
-    let response = client
-        .get(url)
-        .send()
-        .await
-        .with_context(|| format!("HTTP request failed: {url}"))?;
+async fn download_to(http: &Http, url: &str, path: &Path) -> anyhow::Result<()> {
+    let response = http.get(url).await?;
     if !response.status().is_success() {
         bail!("HTTP {} from {url}", response.status());
     }
@@ -256,12 +358,12 @@ async fn download_to(client: &Client, url: &str, path: &Path) -> anyhow::Result<
 }
 
 async fn verify_archive(
-    client: &Client,
+    http: &Http,
     base: &str,
     artifact: &ReleaseArtifact,
     archive: &Path,
 ) -> anyhow::Result<()> {
-    let sidecar = fetch_text(client, &format!("{base}/{}.sha256", artifact.file)).await?;
+    let sidecar = fetch_text(http, &format!("{base}/{}.sha256", artifact.file)).await?;
     let declared = sidecar
         .split_whitespace()
         .next()
@@ -291,16 +393,16 @@ async fn verify_archive(
     Ok(())
 }
 
-async fn fetch_text(client: &Client, url: &str) -> anyhow::Result<String> {
-    let response = client.get(url).send().await?;
+async fn fetch_text(http: &Http, url: &str) -> anyhow::Result<String> {
+    let response = http.get(url).await?;
     if !response.status().is_success() {
         bail!("HTTP {} from {url}", response.status());
     }
     Ok(response.text().await?)
 }
 
-async fn fetch_json<T: for<'de> Deserialize<'de>>(client: &Client, url: &str) -> anyhow::Result<T> {
-    let response = client.get(url).send().await.context(ui::text(
+async fn fetch_json<T: for<'de> Deserialize<'de>>(http: &Http, url: &str) -> anyhow::Result<T> {
+    let response = http.get(url).await.context(ui::text(
         "cli-upgrade-http-request-failed",
         "HTTP request failed",
     ))?;
@@ -678,6 +780,39 @@ mod tests {
         assert_eq!(
             compare_versions("1.0.0-alpha", "1.0.0-alpha.1").unwrap(),
             Ordering::Less
+        );
+    }
+    #[test]
+    fn rewrites_only_configured_github_origins() {
+        let mirrors = Mirrors::parse(
+            Some("https://github-mirror.example/"),
+            Some("https://assets.example/x"),
+        )
+        .unwrap();
+        assert_eq!(
+            mirrors.rewrite("https://github.com/abcred-labs/rivo/releases/latest/download/a.json"),
+            "https://github-mirror.example/abcred-labs/rivo/releases/latest/download/a.json"
+        );
+        assert_eq!(
+            mirrors.rewrite("https://release-assets.githubusercontent.com/p?q=1"),
+            "https://assets.example/x/p?q=1"
+        );
+        assert_eq!(
+            mirrors.rewrite("https://github.com.evil.test/a"),
+            "https://github.com.evil.test/a"
+        );
+        assert_eq!(
+            Mirrors::default().rewrite("https://github.com/a"),
+            "https://github.com/a"
+        );
+    }
+    #[test]
+    fn rejects_non_https_mirrors() {
+        assert!(Mirrors::parse(Some("http://mirror.example"), None).is_err());
+        assert!(Mirrors::parse(None, Some("https://m.example/a b")).is_err());
+        assert_eq!(
+            Mirrors::parse(Some(" "), Some("")).unwrap(),
+            Mirrors::default()
         );
     }
     #[test]

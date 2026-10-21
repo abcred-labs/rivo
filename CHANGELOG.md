@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.9（2026-10-21）
+
+### 安装与升级
+
+- 一键安装脚本（`rivo-install.sh` / `rivo-install.ps1`）和 `rivo upgrade` 新增中国大陆下载镜像支持：设置 `RIVO_GITHUB_MIRROR`（如 `https://github-mirror.abc.red`）与 `RIVO_RELEASE_ASSETS_MIRROR`（如 `https://gh-release-assets.abc.red`）后，逐跳改写 GitHub 与 release-assets 的重定向。镜像只加速传输，manifest、归档名称和 SHA-256 校验不变；两个变量都必须是 `https://` 地址。
+- 安装与升级现在手动逐跳跟随最多 5～6 次 HTTPS 重定向，拒绝降级到 HTTP 的重定向。
+- Unix 安装脚本在解包前拒绝含绝对路径或 `..` 的归档成员，并以 `--no-same-owner` 解包。
+- 安装指南、README 与 Release 说明新增“中国大陆安装”章节；修正二进制运行手册中过时的 `rivo upgrade` 描述。
+
+### 兼容与发布
+
+- Cargo 工作区版本与发布 tag 对齐，`rivo --version`、语言包版本门控和 app-server 上报的运行时版本保持一致。
+- 发布手册改为描述实际流程：全部门禁和五目标矩阵通过后自动发布为 latest。
+
 ## 0.2.8（2026-10-19）
 
 ### 兼容与发布

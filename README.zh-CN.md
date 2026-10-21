@@ -30,6 +30,21 @@ irm https://github.com/abcred-labs/rivo/releases/latest/download/rivo-install.ps
 rivo --version
 ```
 
+**中国大陆：** 直连 GitHub 下载通常很慢或被中断，请使用下载镜像（安装器仍按 GitHub Release
+校验 manifest 与 SHA-256）：
+
+```sh
+curl -fsSL https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.sh | sudo env RIVO_GITHUB_MIRROR=https://github-mirror.abc.red RIVO_RELEASE_ASSETS_MIRROR=https://gh-release-assets.abc.red sh
+rivo --version
+```
+
+```powershell
+$env:RIVO_GITHUB_MIRROR = 'https://github-mirror.abc.red'
+$env:RIVO_RELEASE_ASSETS_MIRROR = 'https://gh-release-assets.abc.red'
+irm https://github-mirror.abc.red/abcred-labs/rivo/releases/latest/download/rivo-install.ps1 | iex
+rivo --version
+```
+
 安装器会先校验 Release manifest 和 SHA-256，再安装完整归档。安装需要管理员权限，
 用户配置、Credential 和会话仍保存在安装目录之外。固定版本命令、手动归档安装和故障处理见
 [安装指南](docs/guides/one-click-install.zh-CN.md)。可用归档和各版本命令见

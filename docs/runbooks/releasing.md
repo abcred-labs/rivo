@@ -41,11 +41,11 @@ Release smoke does not prove every terminal emulator, real model service, real b
 
 1. Update `CHANGELOG.md` with behavior, compatibility and known limitations.
 2. Run the quality gate on the exact commit that will be tagged.
-3. Dispatch the Release workflow with `major.minor.patch`, or push the matching `v<version>` tag. The workflow creates a draft release only.
+3. Dispatch the Release workflow with `major.minor.patch`, or push the matching `v<version>` tag. The workflow runs the full gate and the five-target matrix, then publishes the release as latest only if every job passes; a failed job publishes nothing.
 4. Inspect all five archives, sidecars, manifests, smoke reports and commit fields. The workflow refuses replacing a published version.
 5. Verify the installation docs, checksum commands, archive README and manual-upgrade behavior.
 6. Review repository security settings: private vulnerability reporting, secret scanning/push protection, Dependabot, branch protection and immutable release tags.
-7. Publish the draft manually after maintainer review. After publishing, download each real asset again and run the documented checks plus `rivo upgrade --check`.
+7. After the workflow publishes, download each real asset again and run the documented checks plus `rivo upgrade --check`.
 
 Versions currently use three numeric components and the manifest channel is `stable`. A 0.x release must state experimental behavior and platform limits; it must not claim production stability.
 
