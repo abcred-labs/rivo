@@ -113,6 +113,7 @@ def main() -> int:
         assert "rivo-0.2.0-macos-arm64.tar.gz.sha256" in body
         assert "rivo-0.2.0-windows-amd64.zip" in body
         assert "github-mirror.abc.red" in body and "gh-release-assets.abc.red" in body
+        assert "gh attestation verify" in body
         assert "rivo upgrade --check" in body
         assert "rivo upgrade --apply --yes" in body
 

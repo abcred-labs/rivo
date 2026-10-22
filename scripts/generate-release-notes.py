@@ -34,6 +34,7 @@ def main() -> int:
         [
             "The release assets are unsigned. Verify the SHA-256 sidecar before running an archive.",
             "The short installers verify the release manifest and archive checksum before replacing an installation.",
+            "Since 0.2.11 every archive also has a CycloneDX SBOM and a GitHub build-provenance attestation: `gh attestation verify <archive> --repo " + repository + "`.",
             "",
             "### Fixed release assets",
             "",

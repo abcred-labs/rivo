@@ -31,11 +31,15 @@ The script verifies the active tag ruleset, branch protection or a branch rulese
 
 Archives are not signed today; SHA-256 and the attestation prove integrity and origin, not publisher identity to the operating system.
 
+Decision: Windows and Linux archives will stay unsigned. macOS is undecided and depends on which kind of Apple certificate the organization holds (see below).
+
 | Platform | Needs | Notes |
 | --- | --- | --- |
-| Windows | An Authenticode certificate or Azure Trusted Signing account, stored as repository secrets | Sign `rivo.exe` and `rivo-browser-extension-host.exe` before packaging so the archive checksum covers the signed files. Removes SmartScreen warnings for downloaded ZIPs. |
-| macOS | An Apple Developer ID certificate and notarization credentials | Sign the `rivo` binary with the hardened runtime and notarize it. Bare binaries cannot be stapled; files fetched with `curl` carry no quarantine flag, so the installer path works without it, but browser-downloaded archives benefit. |
-| Linux | Optional detached signature (for example cosign) | The attestation already binds archives to the workflow. |
+| Windows | Not planned. Would need an Authenticode certificate or Azure Trusted Signing account, stored as repository secrets | Sign `rivo.exe` and `rivo-browser-extension-host.exe` before packaging so the archive checksum covers the signed files. Removes SmartScreen warnings for downloaded ZIPs. |
+| macOS | Undecided. Needs a Developer ID Application certificate (Apple Developer Program, organization account) and notarization credentials | Sign the `rivo` binary with the hardened runtime and notarize it. Bare binaries cannot be stapled; files fetched with `curl` carry no quarantine flag, so the installer path works without it, but browser-downloaded archives benefit. |
+| Linux | Not planned. Would be an optional detached signature (for example cosign) | The attestation already binds archives to the workflow. |
+
+An Apple *Enterprise* Program (in-house) certificate is not suitable: it is meant for distributing to the organization's own devices, cannot be notarized and does not satisfy Gatekeeper for public downloads. The regular Apple Developer Program provides Developer ID certificates. Check which one the organization holds before deciding.
 
 None of this can be done without credentials owned by the maintainers. Once secrets exist, add the signing step in `.github/workflows/release.yml` between "Build release binaries" and "Package archive", and extend `scripts/release_smoke.py` to assert the signature.
 

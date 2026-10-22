@@ -31,11 +31,15 @@ GH_TOKEN=<具备仓库管理读取权限的令牌> python scripts/check_repo_sec
 
 目前归档未签名；SHA-256 和 attestation 证明完整性与来源，但不向操作系统证明发布者身份。
 
+决定：Windows 和 Linux 归档保持不签名；macOS 尚未决定，取决于组织持有哪种 Apple 证书（见下）。
+
 | 平台 | 需要 | 说明 |
 | --- | --- | --- |
-| Windows | Authenticode 证书或 Azure Trusted Signing 账号，保存为仓库 secret | 在打包前对 `rivo.exe` 和 `rivo-browser-extension-host.exe` 签名，使归档校验和覆盖已签名文件。可消除下载 ZIP 时的 SmartScreen 警告。 |
-| macOS | Apple Developer ID 证书和公证凭据 | 用 hardened runtime 签名 `rivo` 并公证。裸二进制无法 staple；通过 `curl` 下载的文件没有隔离标记，安装脚本路径不受影响，但浏览器下载的归档会受益。 |
-| Linux | 可选的分离签名（如 cosign） | attestation 已把归档绑定到工作流。 |
+| Windows | 不计划。如需要则用 Authenticode 证书或 Azure Trusted Signing 账号，保存为仓库 secret | 在打包前对 `rivo.exe` 和 `rivo-browser-extension-host.exe` 签名，使归档校验和覆盖已签名文件。可消除下载 ZIP 时的 SmartScreen 警告。 |
+| macOS | 未决定。需要 Developer ID Application 证书（Apple Developer Program 组织账号）和公证凭据 | 用 hardened runtime 签名 `rivo` 并公证。裸二进制无法 staple；通过 `curl` 下载的文件没有隔离标记，安装脚本路径不受影响，但浏览器下载的归档会受益。 |
+| Linux | 不计划。可选的分离签名（如 cosign） | attestation 已把归档绑定到工作流。 |
+
+Apple 的*企业版*（Enterprise / in-house）证书不适用：它面向组织内部设备分发，不能公证，也不满足 Gatekeeper 对公开下载的要求。普通的 Apple Developer Program 才提供 Developer ID 证书，决定前请先确认组织持有的是哪一种。
 
 没有维护者持有的凭据就无法完成以上工作。凭据就绪后，在 `.github/workflows/release.yml` 的“Build release binaries”与“Package archive”之间加入签名步骤，并扩展 `scripts/release_smoke.py` 验证签名。
 
