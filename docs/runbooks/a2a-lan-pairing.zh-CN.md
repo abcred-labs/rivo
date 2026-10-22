@@ -136,6 +136,10 @@ SPKI、Card JCS hash、公开技能、request ID 和六词 SAS。用户必须在
 SAS 不匹配、claim token 重放、CSR proof 无效、Card/SPKI 变化、10 分钟过期或用户拒绝时，不创建
 peer grant，候选保持 `candidate` 或转为 `suspended`。
 
+### 本机双进程检查
+
+没有第二台机器时，可运行 `python scripts/a2a_loopback_smoke.py --rivo <rivo 路径>`：它在回环地址启动 PSK Server（仅由 `RIVO_A2A_LOCAL_TEST=1` 允许），再用独立的 Client 进程配对，检查正确 PSK 能配对并成为 Trusted，错误 PSK 或错误 SPKI pin 被拒绝且不创建 peer。加 `--client-rivo <旧版 rivo>` 可检查与其他构建的兼容性。它使用一次性数据目录和测试身份，不能替代真实跨主机验收。
+
 ## 4. 检查与使用
 
 ```text

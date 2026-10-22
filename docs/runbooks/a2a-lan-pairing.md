@@ -17,6 +17,10 @@ rivo a2a pair <LOCAL_IDENTITY_LABEL> --endpoint <HTTPS_URL> --spki-sha256 <SHA25
 
 Enter the same PSK through stdin when prompted. Verify the displayed endpoint, SAS, SPKI and peer public-key digest on the server owner console before approving the pairing request.
 
+## Local two-process check
+
+Without a second machine, `python scripts/a2a_loopback_smoke.py --rivo <path-to-rivo>` starts a PSK server on loopback (enabled only by `RIVO_A2A_LOCAL_TEST=1`) and pairs from separate client processes. It checks that the correct PSK pairs and becomes Trusted, and that a wrong PSK or SPKI pin is rejected without creating a peer. Add `--client-rivo <older-rivo>` to check compatibility with another build. It uses a throwaway data directory and test identity; it does not replace a real cross-host run.
+
 ## Inspect and use
 
 ```text

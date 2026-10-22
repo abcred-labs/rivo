@@ -23,24 +23,12 @@ The script verifies the active tag ruleset, branch protection or a branch rulese
 1. **Compatibility promise.** Config schema, session schema, the app-server protocol and the upgrade manifest are documented as stable, with tested upgrades from every supported 0.2.x release.
 2. **Real-environment acceptance.** Real browser, interactive TUI, a real model service and cross-node A2A are covered by repeatable acceptance runs, not only mock-based smoke tests. Tests marked ignored in the default suite are either enabled or documented as out of scope.
 3. **Platform support matrix.** Supported operating systems, architectures and libc versions are listed and exercised in CI; unsupported targets (for example musl/Alpine) stay explicitly excluded.
-4. **Supply chain.** Archives have checksums, a CycloneDX SBOM and build-provenance attestations (done), plus platform code signing (below).
+4. **Supply chain.** Archives have checksums, a CycloneDX SBOM and build-provenance attestations (done), with code signing explicitly not planned (below).
 5. **Repository hygiene.** `scripts/check_repo_security.py` passes with a token, and open dependency updates are triaged.
 6. **Documentation.** Install, upgrade, rollback and uninstall are documented in English and Chinese and verified on every supported platform.
 
 ## Code signing
 
-Archives are not signed today; SHA-256 and the attestation prove integrity and origin, not publisher identity to the operating system.
-
-Decision: Windows and Linux archives will stay unsigned. macOS is undecided and depends on which kind of Apple certificate the organization holds (see below).
-
-| Platform | Needs | Notes |
-| --- | --- | --- |
-| Windows | Not planned. Would need an Authenticode certificate or Azure Trusted Signing account, stored as repository secrets | Sign `rivo.exe` and `rivo-browser-extension-host.exe` before packaging so the archive checksum covers the signed files. Removes SmartScreen warnings for downloaded ZIPs. |
-| macOS | Undecided. Needs a Developer ID Application certificate (Apple Developer Program, organization account) and notarization credentials | Sign the `rivo` binary with the hardened runtime and notarize it. Bare binaries cannot be stapled; files fetched with `curl` carry no quarantine flag, so the installer path works without it, but browser-downloaded archives benefit. |
-| Linux | Not planned. Would be an optional detached signature (for example cosign) | The attestation already binds archives to the workflow. |
-
-An Apple *Enterprise* Program (in-house) certificate is not suitable: it is meant for distributing to the organization's own devices, cannot be notarized and does not satisfy Gatekeeper for public downloads. The regular Apple Developer Program provides Developer ID certificates. Check which one the organization holds before deciding.
-
-None of this can be done without credentials owned by the maintainers. Once secrets exist, add the signing step in `.github/workflows/release.yml` between "Build release binaries" and "Package archive", and extend `scripts/release_smoke.py` to assert the signature.
+Decision: Rivo archives are not code-signed on any platform (no Authenticode, Apple Developer ID/notarization or detached Linux signatures). Integrity and origin are covered by the SHA-256 sidecar, the CycloneDX SBOM and the GitHub build-provenance attestation; none of them proves publisher identity to the operating system, so Windows SmartScreen and macOS Gatekeeper may warn for archives downloaded in a browser. The installers and `rivo upgrade` download with `curl`/HTTP clients, which do not apply those quarantine checks. Revisit this only if the project distributes through channels that require signing.
 
 [Release runbook](releasing.md) | [Chinese version](stable-release-plan.zh-CN.md)
